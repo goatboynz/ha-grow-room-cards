@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grow Room Cards - Complete Wiki & Installation Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .nav {
+            background: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .nav-container {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 2rem;
+            overflow-x: auto;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .nav-link {
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 600;
+            white-space: nowrap;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .nav-link:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .content {
+            padding: 3rem 0;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .section h2 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .section h3 {
+            color: #764ba2;
+            font-size: 1.5rem;
+            margin: 1.5rem 0 1rem 0;
+        }
+        
+        .section h4 {
+            color: #555;
+            font-size: 1.2rem;
+            margin: 1rem 0 0.5rem 0;
+        }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .card-item {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s;
+        }
+        
+        .card-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .card-item h4 {
+            color: #667eea;
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card-item .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        code {
+            background: #f4f4f4;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+        }
+        
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .alert-info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            color: #1565C0;
+        }
+        
+        .alert-warning {
+            background: #fff3e0;
+            border-left: 4px solid #FF9800;
+            color: #E65100;
+        }
+        
+        .alert-success {
+            background: #e8f5e9;
+            border-left: 4px solid #4CAF50;
+            color: #2E7D32;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .footer {
+            background: #2d2d2d;
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 3rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .toc {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+        
+        .toc h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        
+        .toc ul {
+            list-style: none;
+            padding-left: 1rem;
+        }
+        
+        .toc li {
+            padding: 0.3rem 0;
+        }
+        
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .toc a:hover {
+            color: #764ba2;
+            padding-left: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>🌱 Grow Room Cards Wiki</h1>
+            <p>Complete Installation & Configuration Guide for Home Assistant</p>
+        </div>
+    </div>
+
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="#installation" class="nav-link">Installation</a>
+            <a href="#cards" class="nav-link">All Cards</a>
+            <a href="#room-overview" class="nav-link">Room Overview</a>
+            <a href="#environment" class="nav-link">Environment</a>
+            <a href="#vpd-chart" class="nav-link">VPD Chart</a>
+            <a href="#report" class="nav-link">Report</a>
+            <a href="#camera" class="nav-link">Camera</a>
+            <a href="#nutrient" class="nav-link">Nutrient</a>
+            <a href="#alert" class="nav-link">Alert</a>
+            <a href="#calendar" class="nav-link">Calendar</a>
+            <a href="#journal" class="nav-link">Journal</a>
+            <a href="#irrigation" class="nav-link">Irrigation</a>
+            <a href="#switch" class="nav-link">Switch</a>
+            <a href="#spectrum" class="nav-link">Spectrum</a>
+            <a href="#troubleshooting" class="nav-link">Troubleshooting</a>
+        </div>
+    </nav>
+
+    <div class="content">
+        <div class="container">
+            
+            <!-- Table of Contents -->
+            <div class="toc">
+                <h3>📑 Quick Navigation</h3>
+                <ul>
+                    <li><a href="#installation">Getting Started & Installation</a></li>
+                    <li><a href="#cards">All Cards Overview</a></li>
+                    <li><a href="#card-details">Detailed Card Configurations</a></li>
+                    <li><a href="#troubleshooting">Troubleshooting & FAQ</a></li>
+                </ul>
+            </div>
+
+
+            <!-- Installation Section -->
+            <section id="installation" class="section">
+                <h2>🚀 Installation</h2>
+                
+                <h3>Method 1: HACS (Recommended)</h3>
+                <div class="alert alert-success">
+                    <strong>✓ Easiest method</strong> - Automatic updates and version management
+                </div>
+                <ol>
+                    <li>Open <strong>HACS</strong> in Home Assistant</li>
+                    <li>Go to <strong>Frontend</strong></li>
+                    <li>Click the <strong>⋮</strong> menu and select <strong>Custom repositories</strong></li>
+                    <li>Add repository: <code>https://github.com/goatboynz/ha-grow-room-cards</code></li>
+                    <li>Category: <strong>Lovelace</strong></li>
+                    <li>Click <strong>Install</strong></li>
+                    <li><strong>Restart</strong> Home Assistant</li>
+                    <li><strong>Clear browser cache</strong> (Ctrl+Shift+R)</li>
+                </ol>
+
+                <h3>Method 2: Manual Installation</h3>
+                <ol>
+                    <li>Download the <a href="https://github.com/goatboynz/ha-grow-room-cards/releases" target="_blank">latest release</a></li>
+                    <li>Copy all <code>.js</code> files to <code>config/www/grow-room-cards/</code></li>
+                    <li>Add resources in Home Assistant:
+                        <ul>
+                            <li>Go to <strong>Settings</strong> → <strong>Dashboards</strong> → <strong>Resources</strong></li>
+                            <li>Click <strong>Add Resource</strong></li>
+                            <li>URL: <code>/local/grow-room-cards/grow-room-cards.js</code></li>
+                            <li>Resource type: <strong>JavaScript Module</strong></li>
+                        </ul>
+                    </li>
+                    <li><strong>Restart</strong> Home Assistant</li>
+                    <li><strong>Clear browser cache</strong> (Ctrl+Shift+R)</li>
+                </ol>
+
+
+                <h3>Verify Installation</h3>
+                <div class="alert alert-info">
+                    After installation, you should see the cards available when adding a new card to your dashboard.
+                </div>
+                <pre><code>1. Edit your dashboard
+2. Click "Add Card"
+3. Search for "grow"
+4. You should see all 12 grow room cards listed</code></pre>
+            </section>
+
+            <!-- All Cards Overview -->
+            <section id="cards" class="section">
+                <h2>📦 All Cards (12 Total)</h2>
+                
+                <div class="card-grid">
+                    <div class="card-item">
+                        <div class="icon">🌸</div>
+                        <h4>Room Overview Card</h4>
+                        <p><code>grow-room-overview-card</code></p>
+                        <p>Complete dashboard with metrics, sparklines, day counter, and alerts. Perfect for main room view.</p>
+                    </div>
+                    
+                    <div class="card-item">
+                        <div class="icon">🌡️</div>
+                        <h4>Environment Monitor</h4>
+                        <p><code>grow-environment-card</code></p>
+                        <p>Real-time monitoring of temperature, humidity, CO2, and VPD with history graphs and modal popups.</p>
+                    </div>
+                    
+                    <div class="card-item">
+                        <div class="icon">📊</div>
+                        <h4>VPD Chart</h4>
+                        <p><code>grow-vpd-chart-card</code></p>
+                        <p>Interactive VPD analysis with color-coded zones and real-time positioning.</p>
+                    </div>
+
+                    
+                    <div class="card-item">
+                        <div class="icon">📋</div>
+                        <h4>Grow Report</h4>
+                        <p><code>grow-report-card</code></p>
+                        <p>Daily/weekly reports with Athena Pro Line schedule, targets, and checklist tabs.</p>
+                    </div>
+                    
+                    <div class="card-item">
+                        <div class="icon">📸</div>
+                        <h4>Camera/Timelapse</h4>
+                        <p><code>grow-camera-card</code></p>
+                        <p>Camera monitoring with timelapse creation and snapshot management.</p>
+                    </div>
+                    
+                    <div class="card-item">
+                        <div class="icon">🧪</div>
+                        <h4>Nutrient Dosing</h4>
+                        <p><code>grow-nutrient-card</code></p>
+                        <p>EC/pH control with automated dosing and reservoir management.</p>
+                    </div>
+                    
+                    <div class="card-item">
+                        <div class="icon">🔔</div>
+                        <h4>Alert Manager</h4>
+                        <p><code>grow-alert-card</code></p>
+                        <p>Centralized alert management with sound notifications and filtering.</p>
+                    </div>
+                    
+                    <div class="card-item">
+                        <div class="icon">📅</div>
+                        <h4>Grow Calendar</h4>
+                        <p><code>grow-calendar-card</code></p>
+                        <p>Visual timeline and multi-room planning with event tracking.</p>
+                    </div>
+
+                    
+                    <div class="card-item">
+                        <div class="icon">📝</div>
+                        <h4>Grow Journal</h4>
+                        <p><code>grow-journal-card</code></p>
+                        <p>Daily notes and observations with tagging and search.</p>
+                    </div>
+                    
+                    <div class="card-item">
+                        <div class="icon">💧</div>
+                        <h4>Irrigation Control</h4>
+                        <p><code>grow-irrigation-card</code></p>
+                        <p>Manage zones with VWC and EC monitoring.</p>
+                    </div>
+                    
+                    <div class="card-item">
+                        <div class="icon">🔌</div>
+                        <h4>Switch Control</h4>
+                        <p><code>grow-switch-card</code></p>
+                        <p>Control lights, fans, and equipment with schedules.</p>
+                    </div>
+                    
+                    <div class="card-item">
+                        <div class="icon">🌈</div>
+                        <h4>Spectrum Sensor</h4>
+                        <p><code>grow-spectrum-card</code></p>
+                        <p>AS7341 spectral visualization with PAR analysis.</p>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- Room Overview Card -->
+            <section id="room-overview" class="section">
+                <h2>🌸 Room Overview Card</h2>
+                <p>Complete dashboard showing all room metrics, day counter, sparklines, and alerts in one view.</p>
+                
+                <h3>Features</h3>
+                <ul class="feature-list">
+                    <li>Room header with stage, day/week counter, and lights status</li>
+                    <li>Last watering event tracker</li>
+                    <li>System alerts with color coding</li>
+                    <li>Environmental metrics with 24-hour sparkline graphs</li>
+                    <li>Dark gradient theme matching professional grow room displays</li>
+                </ul>
+
+                <h3>Basic Configuration</h3>
+                <pre><code>type: custom:grow-room-overview-card
+room_name: F2 Flowering Room
+start_date_entity: input_datetime.f2_flower_start
+lights_entity: light.f2_grow_lights
+temperature_entity: sensor.f2_temperature
+humidity_entity: sensor.f2_humidity
+vpd_entity: sensor.f2_vpd
+co2_entity: sensor.f2_co2</code></pre>
+
+                <h3>Full Configuration</h3>
+                <pre><code>type: custom:grow-room-overview-card
+title: F2 Flowering Room
+room_name: F2 Flowering Room
+start_date_entity: input_datetime.f2_flower_start
+stage_entity: input_select.f2_grow_stage
+lights_entity: light.f2_grow_lights
+temperature_entity: sensor.f2_temperature
+humidity_entity: sensor.f2_humidity
+vpd_entity: sensor.f2_vpd
+leaf_vpd_entity: sensor.f2_leaf_vpd
+co2_entity: sensor.f2_co2
+last_watering_entity: sensor.f2_last_watering
+alert_entities:
+  - binary_sensor.f2_high_temp
+  - binary_sensor.f2_low_humidity
+show_sparklines: true
+light_hours: 12</code></pre>
+
+
+                <h3>Required Entities Setup</h3>
+                <h4>Start Date Entity</h4>
+                <pre><code>input_datetime:
+  f2_flower_start:
+    name: F2 Flower Start Date
+    has_date: true
+    has_time: false</code></pre>
+
+                <h4>Stage Entity (Optional)</h4>
+                <pre><code>input_select:
+  f2_grow_stage:
+    name: F2 Grow Stage
+    options:
+      - Seedling
+      - Vegetative
+      - Flowering
+      - Harvest
+    initial: Flowering</code></pre>
+
+                <h3>Configuration Options</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Option</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>room_name</code></td>
+                            <td>string</td>
+                            <td>Yes</td>
+                            <td>Name of the grow room</td>
+                        </tr>
+                        <tr>
+                            <td><code>start_date_entity</code></td>
+                            <td>string</td>
+                            <td>Yes</td>
+                            <td>Entity tracking grow start date</td>
+                        </tr>
+                        <tr>
+                            <td><code>lights_entity</code></td>
+                            <td>string</td>
+                            <td>Yes</td>
+                            <td>Light switch/entity</td>
+                        </tr>
+                        <tr>
+                            <td><code>show_sparklines</code></td>
+                            <td>boolean</td>
+                            <td>No</td>
+                            <td>Show 24-hour trend graphs (default: true)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+
+            <!-- Environment Monitor Card -->
+            <section id="environment" class="section">
+                <h2>🌡️ Environment Monitor Card</h2>
+                <p>Real-time environmental monitoring with clickable metric cards that open detailed history graphs in modal popups.</p>
+                
+                <h3>Features</h3>
+                <ul class="feature-list">
+                    <li>Four metric cards: Temperature, Humidity, CO2, VPD</li>
+                    <li>Click any card to view detailed 24-hour history graph</li>
+                    <li>Modal popups with enhanced charts and statistics</li>
+                    <li>Color-coded metrics with gradient fills</li>
+                    <li>Min/max/average statistics</li>
+                </ul>
+
+                <h3>Configuration</h3>
+                <pre><code>type: custom:grow-environment-card
+title: Grow Room Environment
+entities:
+  temperature: sensor.grow_room_temperature
+  humidity: sensor.grow_room_humidity
+  vpd: sensor.grow_room_vpd
+  co2: sensor.grow_room_co2</code></pre>
+
+                <div class="alert alert-info">
+                    <strong>💡 Tip:</strong> Click any metric card to view a detailed history graph with min/max/average statistics!
+                </div>
+            </section>
+
+
+            <!-- VPD Chart Card -->
+            <section id="vpd-chart" class="section">
+                <h2>📊 VPD Chart Card</h2>
+                <p>Interactive VPD chart with color-coded zones showing optimal ranges for different grow stages.</p>
+                
+                <h3>Configuration</h3>
+                <pre><code>type: custom:grow-vpd-chart-card
+title: VPD Analysis
+temperature_entity: sensor.grow_room_temperature
+humidity_entity: sensor.grow_room_humidity
+vpd_entity: sensor.grow_room_vpd
+leaf_offset: 2</code></pre>
+
+                <h3>VPD Zones</h3>
+                <ul class="feature-list">
+                    <li><strong>Propagation/Clone:</strong> 0.4-0.8 kPa (Light Blue)</li>
+                    <li><strong>Vegetative:</strong> 0.8-1.2 kPa (Green)</li>
+                    <li><strong>Early Flower:</strong> 1.0-1.4 kPa (Yellow)</li>
+                    <li><strong>Late Flower:</strong> 1.2-1.6 kPa (Orange)</li>
+                </ul>
+            </section>
+
+            <!-- Report Card -->
+            <section id="report" class="section">
+                <h2>📋 Grow Report Card</h2>
+                <p>Comprehensive daily/weekly report with Athena Pro Line feeding schedule and tabbed navigation.</p>
+                
+                <h3>Features</h3>
+                <ul class="feature-list">
+                    <li><strong>Overview Tab:</strong> Current day, environment readings, alerts</li>
+                    <li><strong>Targets Tab:</strong> Athena Pro feeding schedule and EC/pH targets</li>
+                    <li><strong>Schedule Tab:</strong> Defoliation events, IPW spray, harvest window</li>
+                    <li><strong>Irrigation Tab:</strong> Zone watering status</li>
+                    <li><strong>Checklist Tab:</strong> Daily tasks and troubleshooting tips</li>
+                </ul>
+
+
+                <h3>Configuration</h3>
+                <pre><code>type: custom:grow-report-card
+title: Grow Report
+room_name: Main Tent
+start_date_entity: input_datetime.flower_start_date
+temperature_entity: sensor.grow_room_temperature
+humidity_entity: sensor.grow_room_humidity
+vpd_entity: sensor.grow_room_vpd
+co2_entity: sensor.grow_room_co2
+lights_entity: light.grow_lights
+zone_1_entity: switch.irrigation_zone_1
+zone_2_entity: switch.irrigation_zone_2
+light_hours: 12
+feed_system: athena_pro
+grow_medium: coco</code></pre>
+            </section>
+
+            <!-- Camera Card -->
+            <section id="camera" class="section">
+                <h2>📸 Camera/Timelapse Card</h2>
+                <p>Monitor your grow with camera feeds, create timelapses, and manage snapshots.</p>
+                
+                <h3>Configuration</h3>
+                <pre><code>type: custom:grow-camera-card
+title: Grow Room Camera
+camera_entity: camera.grow_room
+snapshot_path: /config/www/grow_snapshots/
+timelapse_interval: 3600
+enable_motion_detection: true</code></pre>
+
+                <h3>Features</h3>
+                <ul class="feature-list">
+                    <li>Live camera feed</li>
+                    <li>Manual snapshot capture</li>
+                    <li>Automatic timelapse creation</li>
+                    <li>Snapshot gallery</li>
+                    <li>Motion detection alerts</li>
+                </ul>
+            </section>
+
+
+            <!-- Nutrient Card -->
+            <section id="nutrient" class="section">
+                <h2>🧪 Nutrient Dosing Card</h2>
+                <p>Manage EC/pH levels with automated dosing and reservoir monitoring.</p>
+                
+                <h3>Configuration</h3>
+                <pre><code>type: custom:grow-nutrient-card
+title: Nutrient Management
+ec_sensor: sensor.reservoir_ec
+ph_sensor: sensor.reservoir_ph
+target_ec: 2.0
+target_ph: 5.8
+ec_up_pump: switch.ec_up_pump
+ec_down_pump: switch.ec_down_pump
+ph_up_pump: switch.ph_up_pump
+ph_down_pump: switch.ph_down_pump
+reservoir_level: sensor.reservoir_level</code></pre>
+
+                <h3>Features</h3>
+                <ul class="feature-list">
+                    <li>Real-time EC and pH monitoring</li>
+                    <li>Target range indicators</li>
+                    <li>Manual and automatic dosing</li>
+                    <li>Reservoir level tracking</li>
+                    <li>Dosing history</li>
+                </ul>
+            </section>
+
+            <!-- Alert Card -->
+            <section id="alert" class="section">
+                <h2>🔔 Alert Manager Card</h2>
+                <p>Centralized alert management with sound notifications, filtering, and multi-room support.</p>
+                
+                <h3>Configuration</h3>
+                <pre><code>type: custom:grow-alert-card
+title: Alert Manager
+rooms:
+  - Main Tent
+  - Veg Room
+enable_sound: true
+show_history: true
+alert_entities:
+  - binary_sensor.high_temp_alert
+  - binary_sensor.low_humidity_alert
+notification_service: notify.mobile_app</code></pre>
+
+
+                <h3>Features</h3>
+                <ul class="feature-list">
+                    <li>Sound notifications for critical alerts</li>
+                    <li>Three tabs: Active, Snoozed, History</li>
+                    <li>Filter by severity (Critical, Warning, Info)</li>
+                    <li>Acknowledge and snooze alerts</li>
+                    <li>Auto-detect alerts from room entities</li>
+                    <li>Summary statistics</li>
+                </ul>
+
+                <div class="alert alert-warning">
+                    <strong>⚠️ Note:</strong> Sound notifications require user interaction with the page first (browser security).
+                </div>
+            </section>
+
+            <!-- Calendar Card -->
+            <section id="calendar" class="section">
+                <h2>📅 Grow Calendar Card</h2>
+                <p>Visual timeline for planning and tracking grow events across multiple rooms.</p>
+                
+                <h3>Configuration</h3>
+                <pre><code>type: custom:grow-calendar-card
+title: Grow Calendar
+rooms:
+  - name: Main Tent
+    start_date_entity: input_datetime.main_tent_start
+    color: "#4CAF50"
+  - name: Veg Room
+    start_date_entity: input_datetime.veg_room_start
+    color: "#2196F3"
+events:
+  - name: Defoliation
+    day: 21
+    icon: "mdi:leaf"
+  - name: Harvest Window
+    day: 56
+    icon: "mdi:cannabis"</code></pre>
+            </section>
+
+
+            <!-- Journal Card -->
+            <section id="journal" class="section">
+                <h2>📝 Grow Journal Card</h2>
+                <p>Document your grow with daily notes, observations, and searchable tags.</p>
+                
+                <h3>Configuration</h3>
+                <pre><code>type: custom:grow-journal-card
+title: Grow Journal
+room_name: Main Tent
+storage_entity: input_text.grow_journal_storage
+enable_photos: true
+tags:
+  - Feeding
+  - Defoliation
+  - Training
+  - Observation
+  - Problem</code></pre>
+
+                <h3>Features</h3>
+                <ul class="feature-list">
+                    <li>Rich text entry with markdown support</li>
+                    <li>Photo attachments</li>
+                    <li>Tagging system</li>
+                    <li>Search and filter</li>
+                    <li>Export to PDF</li>
+                    <li>Timeline view</li>
+                </ul>
+            </section>
+
+            <!-- Irrigation Card -->
+            <section id="irrigation" class="section">
+                <h2>💧 Irrigation Control Card</h2>
+                <p>Manage irrigation zones with VWC and EC monitoring.</p>
+                
+                <h3>Configuration</h3>
+                <pre><code>type: custom:grow-irrigation-card
+title: Irrigation Control
+zones:
+  - name: Zone 1
+    switch: switch.irrigation_zone_1
+    vwc_sensor: sensor.zone_1_vwc
+    ec_sensor: sensor.zone_1_ec
+  - name: Zone 2
+    switch: switch.irrigation_zone_2
+    vwc_sensor: sensor.zone_2_vwc
+    ec_sensor: sensor.zone_2_ec
+schedule_entity: input_boolean.irrigation_schedule</code></pre>
+            </section>
+
+
+            <!-- Switch Card -->
+            <section id="switch" class="section">
+                <h2>🔌 Switch Control Card</h2>
+                <p>Control lights, fans, and equipment with visual status indicators.</p>
+                
+                <h3>Configuration</h3>
+                <pre><code>type: custom:grow-switch-card
+title: Equipment Control
+switches:
+  - entity: light.grow_lights
+    name: Grow Lights
+    icon: "mdi:lightbulb"
+  - entity: switch.exhaust_fan
+    name: Exhaust Fan
+    icon: "mdi:fan"
+  - entity: switch.circulation_fan
+    name: Circulation Fan
+    icon: "mdi:fan"
+  - entity: switch.humidifier
+    name: Humidifier
+    icon: "mdi:water"
+  - entity: switch.dehumidifier
+    name: Dehumidifier
+    icon: "mdi:water-off"</code></pre>
+            </section>
+
+            <!-- Spectrum Card -->
+            <section id="spectrum" class="section">
+                <h2>🌈 Spectrum Sensor Card</h2>
+                <p>Visualize AS7341 spectral data with PAR analysis.</p>
+                
+                <h3>Configuration</h3>
+                <pre><code>type: custom:grow-spectrum-card
+title: Light Spectrum Analysis
+sensor_prefix: sensor.as7341
+channels:
+  - 415nm
+  - 445nm
+  - 480nm
+  - 515nm
+  - 555nm
+  - 590nm
+  - 630nm
+  - 680nm
+show_par: true
+show_ratios: true</code></pre>
+
+                <h3>Features</h3>
+                <ul class="feature-list">
+                    <li>8-channel spectral visualization</li>
+                    <li>PAR calculation</li>
+                    <li>Red/Blue ratio analysis</li>
+                    <li>Historical comparison</li>
+                    <li>Export data</li>
+                </ul>
+            </section>
+
+
+            <!-- Troubleshooting Section -->
+            <section id="troubleshooting" class="section">
+                <h2>🔧 Troubleshooting & FAQ</h2>
+                
+                <h3>Cards Not Showing Up</h3>
+                <div class="alert alert-warning">
+                    <strong>Problem:</strong> Cards don't appear in the "Add Card" menu
+                </div>
+                <p><strong>Solutions:</strong></p>
+                <ol>
+                    <li>Verify resource is added correctly in Settings → Dashboards → Resources</li>
+                    <li>Check the URL path is correct: <code>/local/grow-room-cards/...</code></li>
+                    <li>Clear browser cache (Ctrl+Shift+R or Cmd+Shift+R)</li>
+                    <li>Restart Home Assistant</li>
+                    <li>Check browser console for errors (F12)</li>
+                </ol>
+
+                <h3>"Custom element doesn't exist" Error</h3>
+                <div class="alert alert-warning">
+                    <strong>Problem:</strong> Error message when adding card
+                </div>
+                <p><strong>Solutions:</strong></p>
+                <ol>
+                    <li>Ensure the JavaScript file is in the correct location</li>
+                    <li>Verify the resource type is set to "JavaScript Module"</li>
+                    <li>Check file permissions (should be readable)</li>
+                    <li>Try manual installation if HACS isn't working</li>
+                </ol>
+
+                <h3>Entities Not Updating</h3>
+                <div class="alert alert-warning">
+                    <strong>Problem:</strong> Card shows "unavailable" or old data
+                </div>
+                <p><strong>Solutions:</strong></p>
+                <ol>
+                    <li>Verify entity IDs are correct in Developer Tools → States</li>
+                    <li>Check that sensors are actually updating</li>
+                    <li>Ensure recorder is enabled for history features</li>
+                    <li>Check entity permissions and availability</li>
+                </ol>
+
+
+                <h3>Sparklines/Graphs Not Showing</h3>
+                <div class="alert alert-warning">
+                    <strong>Problem:</strong> History graphs or sparklines are blank
+                </div>
+                <p><strong>Solutions:</strong></p>
+                <ol>
+                    <li>Ensure entities have at least 24 hours of history</li>
+                    <li>Check recorder configuration includes these entities</li>
+                    <li>Verify history API is accessible</li>
+                    <li>Try disabling sparklines: <code>show_sparklines: false</code></li>
+                </ol>
+
+                <h3>Sound Notifications Not Working</h3>
+                <div class="alert alert-info">
+                    <strong>Note:</strong> Browser security requires user interaction before playing sounds
+                </div>
+                <p><strong>Solutions:</strong></p>
+                <ol>
+                    <li>Click anywhere on the page first</li>
+                    <li>Check browser sound permissions</li>
+                    <li>Verify <code>enable_sound: true</code> in config</li>
+                    <li>Test in different browser</li>
+                </ol>
+
+                <h3>Performance Issues</h3>
+                <div class="alert alert-warning">
+                    <strong>Problem:</strong> Dashboard is slow or laggy
+                </div>
+                <p><strong>Solutions:</strong></p>
+                <ol>
+                    <li>Disable sparklines on multiple cards</li>
+                    <li>Reduce history fetch intervals</li>
+                    <li>Use fewer cards per view</li>
+                    <li>Check Home Assistant system resources</li>
+                    <li>Clear browser cache and cookies</li>
+                </ol>
+
+                <h3>Common Configuration Mistakes</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Issue</th>
+                            <th>Cause</th>
+                            <th>Fix</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Card shows "Loading..."</td>
+                            <td>Missing required entity</td>
+                            <td>Check all required entities exist</td>
+                        </tr>
+                        <tr>
+                            <td>Wrong data displayed</td>
+                            <td>Incorrect entity ID</td>
+                            <td>Verify entity IDs in Developer Tools</td>
+                        </tr>
+                        <tr>
+                            <td>Tabs not working</td>
+                            <td>JavaScript error</td>
+                            <td>Check browser console (F12)</td>
+                        </tr>
+                        <tr>
+                            <td>Styling looks wrong</td>
+                            <td>Theme conflict</td>
+                            <td>Try default theme or clear cache</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+                <h3>Getting Help</h3>
+                <div class="alert alert-success">
+                    <strong>Need more help?</strong>
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        <li>Check the <a href="https://github.com/goatboynz/ha-grow-room-cards/issues" target="_blank">GitHub Issues</a></li>
+                        <li>Read the <a href="https://github.com/goatboynz/ha-grow-room-cards/wiki" target="_blank">Wiki Documentation</a></li>
+                        <li>Join the Home Assistant Community Forum</li>
+                        <li>Review example configurations in the repository</li>
+                    </ul>
+                </div>
+
+                <h3>Best Practices</h3>
+                <ul class="feature-list">
+                    <li>Use consistent entity naming (e.g., room_sensor_type)</li>
+                    <li>Set up input_datetime entities for start dates</li>
+                    <li>Configure recorder to keep history for graphs</li>
+                    <li>Test cards individually before combining</li>
+                    <li>Keep Home Assistant and cards updated</li>
+                    <li>Back up your configuration regularly</li>
+                </ul>
+
+                <h3>Recommended Sensors</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Recommended Sensor</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Temperature</td>
+                            <td>SHT31, BME280, DHT22</td>
+                            <td>±0.3°C accuracy recommended</td>
+                        </tr>
+                        <tr>
+                            <td>Humidity</td>
+                            <td>SHT31, BME280</td>
+                            <td>±2% RH accuracy recommended</td>
+                        </tr>
+                        <tr>
+                            <td>CO2</td>
+                            <td>SCD30, SCD40, MH-Z19</td>
+                            <td>NDIR sensors preferred</td>
+                        </tr>
+                        <tr>
+                            <td>Light</td>
+                            <td>AS7341, TSL2591</td>
+                            <td>Spectral sensors for PAR</td>
+                        </tr>
+                        <tr>
+                            <td>EC/pH</td>
+                            <td>Atlas Scientific</td>
+                            <td>Calibration required</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+
+            <!-- Quick Start Guide -->
+            <section class="section">
+                <h2>🚀 Quick Start Guide</h2>
+                
+                <h3>Step 1: Install the Cards</h3>
+                <p>Follow the <a href="#installation">installation instructions</a> above using HACS or manual installation.</p>
+
+                <h3>Step 2: Set Up Required Entities</h3>
+                <p>Create the necessary input helpers and sensors:</p>
+                <pre><code># configuration.yaml
+input_datetime:
+  flower_start_date:
+    name: Flower Start Date
+    has_date: true
+    has_time: false
+
+input_select:
+  grow_stage:
+    name: Grow Stage
+    options:
+      - Seedling
+      - Vegetative
+      - Flowering
+      - Harvest</code></pre>
+
+                <h3>Step 3: Add Your First Card</h3>
+                <ol>
+                    <li>Edit your dashboard</li>
+                    <li>Click "Add Card"</li>
+                    <li>Search for "grow"</li>
+                    <li>Select "Room Overview Card"</li>
+                    <li>Configure with your entities</li>
+                </ol>
+
+                <h3>Step 4: Customize</h3>
+                <p>Add more cards and customize the layout to match your setup!</p>
+
+                <div class="alert alert-success">
+                    <strong>✓ Pro Tip:</strong> Start with the Room Overview Card for a complete dashboard, then add specialized cards as needed.
+                </div>
+            </section>
+
+            <!-- Example Dashboard -->
+            <section class="section">
+                <h2>📱 Example Dashboard Layout</h2>
+                <p>Here's a recommended layout for a complete grow room dashboard:</p>
+                
+                <pre><code>views:
+  - title: Main Dashboard
+    cards:
+      # Top row - Room overview
+      - type: custom:grow-room-overview-card
+        room_name: Main Tent
+        # ... config ...
+      
+      # Second row - Environment details
+      - type: horizontal-stack
+        cards:
+          - type: custom:grow-environment-card
+            # ... config ...
+          - type: custom:grow-vpd-chart-card
+            # ... config ...
+      
+      # Third row - Controls
+      - type: horizontal-stack
+        cards:
+          - type: custom:grow-switch-card
+            # ... config ...
+          - type: custom:grow-irrigation-card
+            # ... config ...
+      
+      # Fourth row - Monitoring
+      - type: custom:grow-camera-card
+        # ... config ...
+      
+      # Fifth row - Management
+      - type: horizontal-stack
+        cards:
+          - type: custom:grow-report-card
+            # ... config ...
+          - type: custom:grow-alert-card
+            # ... config ...</code></pre>
+            </section>
+
+
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <h3>🌱 Grow Room Cards</h3>
+            <p>Complete suite of custom cards for Home Assistant grow room automation</p>
+            <p style="margin-top: 1rem;">
+                <a href="https://github.com/goatboynz/ha-grow-room-cards" target="_blank" class="btn">
+                    View on GitHub
+                </a>
+            </p>
+            <p style="margin-top: 2rem; opacity: 0.7; font-size: 0.9rem;">
+                Version 2.0 | Made with ❤️ for the grow community
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Highlight active nav link on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('.section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.style.background = '';
+                link.style.color = '';
+                if (link.getAttribute('href') === '#' + current) {
+                    link.style.background = '#667eea';
+                    link.style.color = 'white';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
