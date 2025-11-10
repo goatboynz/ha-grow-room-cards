@@ -17,3 +17,5 @@ import './grow-report-card.js';
 import './grow-camera-card.js';
 import './grow-nutrient-card.js';
 import './grow-alert-card.js';
+import './grow-calendar-card.js';
+import './grow-journal-card.js';

@@ -8,7 +8,7 @@ A complete suite of custom cards for monitoring and controlling your grow room e
 
 ![Grow Room Cards](https://img.shields.io/badge/Cards-5-green) ![Status](https://img.shields.io/badge/Status-Stable-success)
 
-## 🌱 Cards Included
+## 🌱 Cards Included (11 Total)
 
 | Card | Type | Purpose |
 |------|------|---------|
@@ -18,6 +18,8 @@ A complete suite of custom cards for monitoring and controlling your grow room e
 | 📸 **Camera/Timelapse** | `grow-camera-card` | Camera monitoring with timelapse and snapshots |
 | 🧪 **Nutrient Dosing** | `grow-nutrient-card` | EC/pH control with automated dosing |
 | 🔔 **Alert Manager** | `grow-alert-card` | Centralized alert management for all rooms |
+| 📅 **Grow Calendar** | `grow-calendar-card` | Visual timeline and multi-room planning |
+| 📝 **Grow Journal** | `grow-journal-card` | Daily notes and observations with tagging |
 | 🌈 **Spectrum Sensor** | `grow-spectrum-card` | AS7341 spectral visualization |
 | 💧 **Irrigation Control** | `grow-irrigation-card` | Manage zones with VWC and EC monitoring |
 | 🔌 **Switch Control** | `grow-switch-card` | Control lights, fans, and equipment |
@@ -141,7 +143,87 @@ See [REPORT-CARD-SETUP.md](REPORT-CARD-SETUP.md) for complete setup guide.
 
 ---
 
-### 4. Switch Control Card
+### 4. Camera/Timelapse Card
+
+Camera monitoring with timelapse and snapshot gallery.
+
+```yaml
+type: custom:grow-camera-card
+camera_entity: camera.grow_room
+motion_entity: binary_sensor.grow_room_motion
+show_motion_detection: true
+refresh_interval: 5000
+```
+
+**Features:**
+- Live camera feed with auto-refresh
+- Snapshot capture and gallery
+- Timelapse playback
+- Before/after comparison
+- Motion detection indicator
+
+---
+
+### 5. Nutrient Dosing Card
+
+EC/pH control with automated dosing pumps.
+
+```yaml
+type: custom:grow-nutrient-card
+reservoir_ec: sensor.reservoir_ec
+reservoir_ph: sensor.reservoir_ph
+reservoir_level: sensor.reservoir_level
+reservoir_temp: sensor.reservoir_temp
+target_ec: 2.0
+target_ph: 5.8
+reservoir_volume: 100
+dosing_pumps:
+  - entity: switch.pump_part_a
+    name: Part A
+    ml_per_second: 10
+  - entity: switch.pump_part_b
+    name: Part B
+    ml_per_second: 10
+```
+
+**Features:**
+- Real-time EC/pH/Level/Temp display
+- Automated dosing pump control
+- Dosing calculator
+- Target range alerts
+- Manual and auto-dose modes
+
+---
+
+### 6. Alert Manager Card
+
+Centralized alert management for all grow rooms.
+
+```yaml
+type: custom:grow-alert-card
+rooms:
+  - Flower Room 1
+  - Flower Room 2
+  - Veg Room
+alert_entities:
+  - binary_sensor.f1_high_temp
+  - binary_sensor.f1_low_humidity
+  - binary_sensor.f1_light_leak
+show_history: true
+notification_service: notify.mobile_app
+```
+
+**Features:**
+- Centralized alerts from all rooms
+- Critical/Warning/Info severity levels
+- Snooze and acknowledge alerts
+- Alert history tracking
+- Room filtering
+- Auto-detection of alert entities
+
+---
+
+### 11. Switch Control Card
 
 Stylish control panel for all your grow room equipment.
 
@@ -187,7 +269,7 @@ switches:
 
 ---
 
-### 5. Irrigation Control Card
+### 10. Irrigation Control Card
 
 Manage watering zones with soil moisture (VWC) and nutrient (EC) monitoring.
 
@@ -223,7 +305,85 @@ zones:
 
 ---
 
-### 6. Spectrum Sensor Card
+### 7. Grow Calendar Card
+
+Visual timeline and scheduling for multiple grow rooms.
+
+```yaml
+type: custom:grow-calendar-card
+rooms:
+  - name: Flower Room 1
+    start_date_entity: input_datetime.f1_start_date
+  - name: Flower Room 2
+    start_date_entity: input_datetime.f2_start_date
+show_events: true
+show_tasks: true
+```
+
+**Features:**
+- Month, Timeline, and Tasks views
+- Automatic event scheduling (deleaf, lollipop, harvest)
+- Multi-room support
+- Color-coded events
+- Upcoming tasks with countdown
+
+**Required Setup:**
+```yaml
+# configuration.yaml
+input_datetime:
+  f1_start_date:
+    name: Flower Room 1 Start Date
+    has_date: true
+    has_time: false
+  f2_start_date:
+    name: Flower Room 2 Start Date
+    has_date: true
+    has_time: false
+```
+
+---
+
+### 8. Grow Journal Card
+
+Daily notes and observations with tagging and filtering.
+
+```yaml
+type: custom:grow-journal-card
+room_name: Flower Room 1
+storage_entity: input_text.f1_journal
+max_entries: 100
+tags:
+  - General
+  - Watering
+  - Feeding
+  - Training
+  - Deficiency
+  - Pest
+  - Observation
+```
+
+**Features:**
+- Quick note entry with tags
+- Filter by tag
+- Entry statistics
+- Delete entries
+- Persistent storage in Home Assistant
+
+**Required Setup:**
+```yaml
+# configuration.yaml
+input_text:
+  f1_journal:
+    name: Flower Room 1 Journal
+    max: 255
+    initial: "[]"
+```
+
+**Note**: For longer journal entries, you may need to increase the `max` value or use multiple input_text entities.
+
+---
+
+### 9. Spectrum Sensor Card
 
 Visualize light spectrum from AS7341 spectral sensor.
 
