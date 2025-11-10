@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Card Loading</title>
+</head>
+<body>
+    <h1>Grow Room Cards - Load Test</h1>
+    <div id="status"></div>
+    
+    <script type="module">
+        const status = document.getElementById('status');
+        
+        // Test loading Room Overview Card
+        try {
+            await import('./grow-room-overview-card.js');
+            status.innerHTML += '<p style="color: green;">✓ Room Overview Card loaded successfully</p>';
+            
+            // Check if custom element is defined
+            if (customElements.get('grow-room-overview-card')) {
+                status.innerHTML += '<p style="color: green;">✓ grow-room-overview-card is registered</p>';
+            } else {
+                status.innerHTML += '<p style="color: red;">✗ grow-room-overview-card NOT registered</p>';
+            }
+        } catch (err) {
+            status.innerHTML += '<p style="color: red;">✗ Failed to load Room Overview Card: ' + err.message + '</p>';
+        }
+        
+        // Test loading Camera Card
+        try {
+            await import('./grow-camera-card.js');
+            status.innerHTML += '<p style="color: green;">✓ Camera Card loaded successfully</p>';
+            
+            if (customElements.get('grow-camera-card')) {
+                status.innerHTML += '<p style="color: green;">✓ grow-camera-card is registered</p>';
+            } else {
+                status.innerHTML += '<p style="color: red;">✗ grow-camera-card NOT registered</p>';
+            }
+        } catch (err) {
+            status.innerHTML += '<p style="color: red;">✗ Failed to load Camera Card: ' + err.message + '</p>';
+        }
+        
+        // Test loading Switch Card
+        try {
+            await import('./grow-switch-card.js');
+            status.innerHTML += '<p style="color: green;">✓ Switch Card loaded successfully</p>';
+            
+            if (customElements.get('grow-switch-card')) {
+                status.innerHTML += '<p style="color: green;">✓ grow-switch-card is registered</p>';
+            } else {
+                status.innerHTML += '<p style="color: red;">✗ grow-switch-card NOT registered</p>';
+            }
+        } catch (err) {
+            status.innerHTML += '<p style="color: red;">✗ Failed to load Switch Card: ' + err.message + '</p>';
+        }
+    </script>
+</body>
+</html>
