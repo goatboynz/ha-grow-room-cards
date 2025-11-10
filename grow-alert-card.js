@@ -3,6 +3,8 @@ class GrowAlertCard extends HTMLElement {
     super();
     this.attachShadow({ mode: 'open' });
     this.snoozedAlerts = new Set();
+    this.acknowledgedAlerts = new Set();
+    this.lastCriticalAlertCount = 0;
   }
 
   setConfig(config) {
@@ -321,10 +323,46 @@ class GrowAlertCard extends HTMLElement {
     if (!this._hass) return;
 
     const alerts = this.collectAlerts();
+    this.checkForNewCriticalAlerts(alerts);
     this.updateSummary(alerts);
     this.updateAlertCount(alerts);
     this.updateFilters(alerts);
     this.displayAlerts(alerts);
+  }
+
+  checkForNewCriticalAlerts(alerts) {
+    const criticalAlerts = alerts.filter(a => a.severity === 'critical' && !this.snoozedAlerts.has(a.id) && !this.acknowledgedAlerts.has(a.id));
+    const currentCriticalCount = criticalAlerts.length;
+    
+    // Play sound if new critical alerts appeared
+    if (currentCriticalCount > this.lastCriticalAlertCount && this.config.enable_sound !== false) {
+      this.playAlertSound();
+    }
+    
+    this.lastCriticalAlertCount = currentCriticalCount;
+  }
+
+  playAlertSound() {
+    // Create a simple beep using Web Audio API
+    try {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 800;
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.5);
+    } catch (e) {
+      console.log('Could not play alert sound:', e);
+    }
   }
 
   collectAlerts() {
@@ -581,8 +619,8 @@ class GrowAlertCard extends HTMLElement {
   }
 
   acknowledgeAlert(alertId) {
-    // In a real implementation, this would mark the alert as acknowledged
-    // For now, just remove it from view
+    // Mark as acknowledged to prevent sound notifications
+    this.acknowledgedAlerts.add(alertId);
     this.snoozedAlerts.add(alertId);
     this.updateCard();
 
