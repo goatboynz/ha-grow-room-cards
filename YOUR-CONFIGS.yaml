@@ -1,0 +1,109 @@
+# YOUR SPECIFIC CONFIGURATIONS
+# Copy these directly into your Lovelace dashboard
+
+# ============================================
+# F2 CAMERA - RTSP Configuration
+# ============================================
+# This is your exact camera setup with proper formatting
+
+- type: custom:grow-camera-card
+  title: F2 Camera
+  rtsp_url: "rtsp://192.168.1.228:554/user=goatboy_password=SmokeupDab710_channel=6_stream=1.sdp"
+  rtsp_username: goatboy
+  rtsp_password: SmokeupDab710
+  rtsp_snapshot_url: "http://192.168.1.228/snapshot.jpg"
+  snapshot_times:
+    - "06:00"
+    - "12:00"
+    - "18:00"
+    - "00:00"
+  snapshot_storage: /config/www/snapshots/
+
+# ============================================
+# F2 SWITCH CONTROL - With Tabs
+# ============================================
+# Fixed indentation - each level is 2 spaces
+
+- type: custom:grow-switch-card
+  title: F2 Equipment Control
+  tabs:
+    - name: Lighting
+      switches:
+        - entity: switch.f2_light
+          name: Main Lights
+          icon: "mdi:lightbulb"
+        - entity: switch.f2_lights1
+          name: UV Lights
+          icon: "mdi:lightbulb-outline"
+    
+    - name: Climate
+      switches:
+        - entity: switch.f2_exhaust_fan
+          name: Exhaust Fan
+          icon: "mdi:fan"
+        - entity: switch.f2_humidifier
+          name: Humidifier
+          icon: "mdi:water"
+    
+    - name: Irrigation
+      switches:
+        - entity: switch.f2_irrigation_pump
+          name: Main Pump
+          icon: "mdi:water-pump"
+
+# ============================================
+# IMPORTANT: STEPS TO FIX YOUR ERRORS
+# ============================================
+
+# 1. CLEAR BROWSER CACHE
+#    - Press Ctrl + Shift + R (Windows/Linux)
+#    - Or Cmd + Shift + R (Mac)
+#    - This will force reload the cards
+
+# 2. RESTART HOME ASSISTANT
+#    - Go to Developer Tools → YAML
+#    - Click "Restart"
+
+# 3. ADD SHELL COMMAND (for RTSP snapshots)
+#    Add this to your configuration.yaml:
+
+# shell_command:
+#   capture_rtsp_snapshot: >
+#     ffmpeg -rtsp_transport tcp 
+#     -i {{ rtsp_url }} 
+#     -frames:v 1 
+#     {{ filename }}
+
+# 4. CREATE SNAPSHOT DIRECTORY
+#    Make sure this directory exists:
+#    /config/www/snapshots/
+
+# 5. VERIFY ENTITY IDs
+#    Go to Developer Tools → States
+#    Search for your switches to get exact entity IDs:
+#    - switch.f2_light
+#    - switch.f2_lights1
+#    - switch.f2_exhaust_fan
+#    - switch.f2_humidifier
+#    - switch.f2_irrigation_pump
+
+# ============================================
+# YAML INDENTATION GUIDE
+# ============================================
+# Each level should be indented by exactly 2 spaces
+# DO NOT use tabs!
+
+# Level 0 (no indent)
+type: custom:grow-switch-card
+title: Equipment Control
+# Level 1 (2 spaces)
+tabs:
+  # Level 2 (4 spaces)
+  - name: Lighting
+    # Level 3 (6 spaces)
+    switches:
+      # Level 4 (8 spaces)
+      - entity: switch.f2_light
+        # Level 5 (10 spaces)
+        name: Main Lights
+        icon: "mdi:lightbulb"
