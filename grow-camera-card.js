@@ -8,21 +8,27 @@ class GrowCameraCard extends HTMLElement {
   }
 
   setConfig(config) {
-    if (!config.camera_entity) {
-      throw new Error('Please define camera_entity');
+    if (!config.camera_entity && !config.rtsp_url) {
+      throw new Error('Please define either camera_entity or rtsp_url');
     }
     
     this.config = {
       ...config,
       title: config.title || 'Grow Camera',
       refresh_interval: config.refresh_interval || 5000,
-      timelapse_times: config.timelapse_times || ['06:00', '12:00', '18:00', '00:00'],
-      timelapse_storage: config.timelapse_storage || '/config/www/timelapse/'
+      snapshot_times: config.snapshot_times || ['06:00', '12:00', '18:00', '00:00'],
+      snapshot_storage: config.snapshot_storage || '/config/www/snapshots/',
+      use_rtsp: !!config.rtsp_url,
+      rtsp_url: config.rtsp_url,
+      rtsp_username: config.rtsp_username,
+      rtsp_password: config.rtsp_password
     };
     
     this.render();
-    this.startRefresh();
-    this.scheduleTimelapseCaptures();
+    if (!this.config.use_rtsp) {
+      this.startRefresh();
+    }
+    this.scheduleSnapshotCaptures();
   }
 
   set hass(hass) {
@@ -274,26 +280,39 @@ class GrowCameraCard extends HTMLElement {
     ).join('');
   }
 
-  scheduleTimelapseCaptures() {
+  scheduleSnapshotCaptures() {
     // Check every minute if it's time to capture
     setInterval(() => {
       const now = new Date();
       const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
       
-      if (this.config.timelapse_times.includes(currentTime)) {
-        this.captureTimelapsePhoto();
+      if (this.config.snapshot_times.includes(currentTime)) {
+        this.captureSnapshot();
       }
     }, 60000); // Check every minute
   }
 
-  captureTimelapsePhoto() {
+  captureSnapshot() {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const filename = `${this.config.timelapse_storage}${this.config.camera_entity.split('.')[1]}_${timestamp}.jpg`;
+    const entityName = this.config.camera_entity ? this.config.camera_entity.split('.')[1] : 'rtsp_camera';
+    const filename = `${this.config.snapshot_storage}${entityName}_${timestamp}.jpg`;
     
-    this._hass.callService('camera', 'snapshot', {
-      entity_id: this.config.camera_entity,
-      filename: filename
-    });
+    if (this.config.use_rtsp) {
+      // For RTSP, we need to use a service that can capture from RTSP stream
+      // This requires a custom integration or script
+      this._hass.callService('shell_command', 'capture_rtsp_snapshot', {
+        rtsp_url: this.config.rtsp_url,
+        filename: filename,
+        username: this.config.rtsp_username,
+        password: this.config.rtsp_password
+      });
+    } else {
+      // Standard Home Assistant camera snapshot
+      this._hass.callService('camera', 'snapshot', {
+        entity_id: this.config.camera_entity,
+        filename: filename
+      });
+    }
   }
 
   startRefresh() {
@@ -326,10 +345,7 @@ class GrowCameraCard extends HTMLElement {
     // Update camera image
     this.updateCameraImage();
 
-    // Update motion detection
-    if (this.config.show_motion_detection && this.config.motion_entity) {
-      this.updateMotionStatus();
-    }
+    // Motion detection removed - not needed for RTSP cameras
 
     // Update time
     const timeEl = this.shadowRoot.getElementById('camera-time');
@@ -338,33 +354,34 @@ class GrowCameraCard extends HTMLElement {
   }
 
   updateCameraImage() {
-    const cameraEntity = this._hass.states[this.config.camera_entity];
-    if (!cameraEntity) return;
-
     const imageEl = this.shadowRoot.getElementById('camera-image');
-    const entityPicture = cameraEntity.attributes.entity_picture;
     
-    if (entityPicture) {
-      // Add timestamp to prevent caching
-      const timestamp = new Date().getTime();
-      imageEl.src = `${entityPicture}&t=${timestamp}`;
+    if (this.config.use_rtsp) {
+      // For RTSP, we need to use a proxy or convert to HLS/WebRTC
+      // Option 1: Use go2rtc or similar proxy
+      // Option 2: Use snapshot refresh
+      // For now, we'll use periodic snapshots
+      if (this.config.rtsp_snapshot_url) {
+        const timestamp = new Date().getTime();
+        imageEl.src = `${this.config.rtsp_snapshot_url}?t=${timestamp}`;
+      } else {
+        imageEl.src = '/local/snapshots/latest.jpg?t=' + new Date().getTime();
+      }
+    } else {
+      const cameraEntity = this._hass.states[this.config.camera_entity];
+      if (!cameraEntity) return;
+
+      const entityPicture = cameraEntity.attributes.entity_picture;
+      
+      if (entityPicture) {
+        // Add timestamp to prevent caching
+        const timestamp = new Date().getTime();
+        imageEl.src = `${entityPicture}&t=${timestamp}`;
+      }
     }
   }
 
-  updateMotionStatus() {
-    const motionEntity = this._hass.states[this.config.motion_entity];
-    const motionEl = this.shadowRoot.getElementById('motion-status');
-    
-    if (motionEntity) {
-      const isDetected = motionEntity.state === 'on';
-      motionEl.innerHTML = `
-        <span class="motion-indicator ${isDetected ? 'detected' : 'clear'}">
-          <ha-icon icon="mdi:motion-sensor"></ha-icon>
-          ${isDetected ? 'Motion' : 'Clear'}
-        </span>
-      `;
-    }
-  }
+
 
   showNoCameraMessage() {
     const container = this.shadowRoot.getElementById('camera-container');

@@ -668,24 +668,49 @@ grow_medium: coco</code></pre>
             <!-- Camera Card -->
             <section id="camera" class="section">
                 <h2>📸 Camera/Timelapse Card</h2>
-                <p>Monitor your grow with camera feeds, create timelapses, and manage snapshots.</p>
+                <p>Monitor your grow with camera feeds (including RTSP), scheduled snapshots, and timelapse creation.</p>
                 
-                <h3>Configuration</h3>
+                <h3>Configuration (Standard Camera)</h3>
                 <pre><code>type: custom:grow-camera-card
 title: Grow Room Camera
 camera_entity: camera.grow_room
-snapshot_path: /config/www/grow_snapshots/
-timelapse_interval: 3600
-enable_motion_detection: true</code></pre>
+snapshot_storage: /config/www/snapshots/
+snapshot_times:
+  - "06:00"
+  - "12:00"
+  - "18:00"
+  - "00:00"</code></pre>
+
+                <h3>Configuration (RTSP Camera)</h3>
+                <pre><code>type: custom:grow-camera-card
+title: Grow Room Camera
+rtsp_url: rtsp://192.168.1.100:554/stream
+rtsp_username: admin
+rtsp_password: password
+rtsp_snapshot_url: http://192.168.1.100/snapshot.jpg
+snapshot_storage: /config/www/snapshots/
+snapshot_times:
+  - "06:00"
+  - "12:00"
+  - "18:00"
+  - "00:00"</code></pre>
 
                 <h3>Features</h3>
                 <ul class="feature-list">
-                    <li>Live camera feed</li>
+                    <li>Live camera feed (standard or RTSP)</li>
                     <li>Manual snapshot capture</li>
-                    <li>Automatic timelapse creation</li>
+                    <li>Scheduled automatic snapshots at specific times</li>
                     <li>Snapshot gallery</li>
-                    <li>Motion detection alerts</li>
+                    <li>Timelapse creation from snapshots</li>
                 </ul>
+
+                <div class="alert alert-info">
+                    <strong>💡 RTSP Setup:</strong> For RTSP cameras, you'll need to set up a shell command to capture snapshots. Add this to your configuration.yaml:
+                    <pre style="margin-top: 0.5rem;"><code>shell_command:
+  capture_rtsp_snapshot: >
+    ffmpeg -rtsp_transport tcp -i {{ rtsp_url }} 
+    -frames:v 1 {{ filename }}</code></pre>
+                </div>
             </section>
 
 
@@ -829,9 +854,9 @@ schedule_entity: input_boolean.irrigation_schedule</code></pre>
             <!-- Switch Card -->
             <section id="switch" class="section">
                 <h2>🔌 Switch Control Card</h2>
-                <p>Control lights, fans, and equipment with visual status indicators.</p>
+                <p>Control lights, fans, and equipment with visual status indicators. Supports categories/tabs for organized control.</p>
                 
-                <h3>Configuration</h3>
+                <h3>Basic Configuration (No Tabs)</h3>
                 <pre><code>type: custom:grow-switch-card
 title: Equipment Control
 switches:
@@ -850,6 +875,56 @@ switches:
   - entity: switch.dehumidifier
     name: Dehumidifier
     icon: "mdi:water-off"</code></pre>
+
+                <h3>Advanced Configuration (With Categories/Tabs)</h3>
+                <pre><code>type: custom:grow-switch-card
+title: Equipment Control
+tabs:
+  - name: Lighting
+    switches:
+      - entity: light.grow_lights
+        name: Main Lights
+        icon: "mdi:lightbulb"
+      - entity: light.uv_lights
+        name: UV Lights
+        icon: "mdi:lightbulb-outline"
+  
+  - name: Climate
+    switches:
+      - entity: switch.exhaust_fan
+        name: Exhaust Fan
+        icon: "mdi:fan"
+      - entity: switch.circulation_fan
+        name: Circulation
+        icon: "mdi:fan"
+      - entity: switch.humidifier
+        name: Humidifier
+        icon: "mdi:water"
+      - entity: switch.dehumidifier
+        name: Dehumidifier
+        icon: "mdi:water-off"
+  
+  - name: Irrigation
+    switches:
+      - entity: switch.irrigation_pump
+        name: Main Pump
+        icon: "mdi:water-pump"
+      - entity: switch.zone_1
+        name: Zone 1
+        icon: "mdi:sprinkler"
+      - entity: switch.zone_2
+        name: Zone 2
+        icon: "mdi:sprinkler"</code></pre>
+
+                <h3>Features</h3>
+                <ul class="feature-list">
+                    <li>Visual on/off status with color coding</li>
+                    <li>Tap to toggle switches</li>
+                    <li>Custom icons for each switch</li>
+                    <li>Organized tabs/categories</li>
+                    <li>Responsive grid layout</li>
+                    <li>Unavailable state handling</li>
+                </ul>
             </section>
 
             <!-- Spectrum Card -->

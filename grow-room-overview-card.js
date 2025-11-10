@@ -543,3 +543,12 @@ class GrowRoomOverviewCard extends HTMLElement {
 }
 
 customElements.define('grow-room-overview-card', GrowRoomOverviewCard);
+
+// Register with Home Assistant
+window.customCards = window.customCards || [];
+window.customCards.push({
+  type: 'grow-room-overview-card',
+  name: 'Grow Room Overview Card',
+  description: 'Complete room dashboard with metrics, sparklines, and alerts',
+  preview: true
+});

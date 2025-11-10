@@ -146,22 +146,34 @@ See [REPORT-CARD-SETUP.md](REPORT-CARD-SETUP.md) for complete setup guide.
 
 ### 4. Camera/Timelapse Card
 
-Camera monitoring with timelapse and snapshot gallery.
+Camera monitoring with RTSP support, scheduled snapshots, and timelapse creation.
 
+**Standard Camera:**
 ```yaml
 type: custom:grow-camera-card
 camera_entity: camera.grow_room
-motion_entity: binary_sensor.grow_room_motion
-show_motion_detection: true
-refresh_interval: 5000
+snapshot_times: ['06:00', '12:00', '18:00', '00:00']
+snapshot_storage: /config/www/snapshots/
+```
+
+**RTSP Camera:**
+```yaml
+type: custom:grow-camera-card
+rtsp_url: rtsp://192.168.1.100:554/stream
+rtsp_username: admin
+rtsp_password: password
+rtsp_snapshot_url: http://192.168.1.100/snapshot.jpg
+snapshot_times: ['06:00', '12:00', '18:00', '00:00']
+snapshot_storage: /config/www/snapshots/
 ```
 
 **Features:**
-- Live camera feed with auto-refresh
-- Snapshot capture and gallery
-- Timelapse playback
+- Live camera feed (standard or RTSP)
+- Scheduled automatic snapshots
+- Manual snapshot capture
+- Timelapse creation from snapshots
+- Snapshot gallery
 - Before/after comparison
-- Motion detection indicator
 
 ---
 
@@ -226,36 +238,60 @@ notification_service: notify.mobile_app
 
 ### 11. Switch Control Card
 
-Stylish control panel for all your grow room equipment.
+Stylish control panel for all your grow room equipment with optional category tabs.
 
+**Basic Configuration:**
 ```yaml
 type: custom:grow-switch-card
 title: Equipment Control
 switches:
-  - entity: switch.grow_light
-    name: Main Light
-    type: light
+  - entity: light.grow_lights
+    name: Main Lights
+    icon: "mdi:lightbulb"
   - entity: switch.exhaust_fan
     name: Exhaust Fan
-    type: fan
+    icon: "mdi:fan"
   - entity: switch.circulation_fan
     name: Circulation Fan
-    type: fan
-  - entity: switch.humidifier
-    name: Humidifier
-    type: humidifier
-  - entity: switch.dehumidifier
-    name: Dehumidifier
-    type: dehumidifier
-  - entity: switch.heater
-    name: Heater
-    type: heater
+    icon: "mdi:fan"
 ```
 
-**Supported Device Types:**
-- `light` 💡 - Grow lights
-- `fan` 🌀 - Fans
-- `humidifier` 💨 - Humidifiers
+**With Categories/Tabs:**
+```yaml
+type: custom:grow-switch-card
+title: Equipment Control
+tabs:
+  - name: Lighting
+    switches:
+      - entity: light.grow_lights
+        name: Main Lights
+        icon: "mdi:lightbulb"
+      - entity: light.uv_lights
+        name: UV Lights
+        icon: "mdi:lightbulb-outline"
+  
+  - name: Climate
+    switches:
+      - entity: switch.exhaust_fan
+        name: Exhaust Fan
+        icon: "mdi:fan"
+      - entity: switch.humidifier
+        name: Humidifier
+        icon: "mdi:water"
+  
+  - name: Irrigation
+    switches:
+      - entity: switch.irrigation_pump
+        name: Main Pump
+        icon: "mdi:water-pump"
+```
+
+**Features:**
+- Visual on/off status with color coding
+- Tap to toggle switches
+- Custom icons for each switch
+- Optional category tabs for organization
+- Responsive grid layout
 - `dehumidifier` 🌬️ - Dehumidifiers
 - `heater` 🔥 - Heaters
 - `cooler` ❄️ - Coolers
