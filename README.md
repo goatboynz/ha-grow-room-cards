@@ -14,6 +14,7 @@ A complete suite of custom cards for monitoring and controlling your grow room e
 |------|------|---------|
 | 🌡️ **Environment Monitor** | `grow-environment-card` | Monitor temp, humidity, CO2, VPD with history |
 | 📊 **VPD Chart** | `grow-vpd-chart-card` | Interactive VPD analysis with color zones |
+| 📋 **Grow Report** | `grow-report-card` | Daily/weekly report with Athena Pro Line schedule |
 | 🌈 **Spectrum Sensor** | `grow-spectrum-card` | AS7341 spectral visualization |
 | 💧 **Irrigation Control** | `grow-irrigation-card` | Manage zones with VWC and EC monitoring |
 | 🔌 **Switch Control** | `grow-switch-card` | Control lights, fans, and equipment |
@@ -99,7 +100,45 @@ growth_stage: vegetative  # Options: seedling, vegetative, flowering, late_flowe
 
 ---
 
-### 3. Switch Control Card
+### 3. Grow Report Card
+
+Comprehensive daily/weekly grow report based on Athena Pro Line feeding schedule.
+
+```yaml
+type: custom:grow-report-card
+room_name: Flower Room 1
+start_date_entity: input_datetime.f1_start_date
+temperature_entity: sensor.f1_temperature
+humidity_entity: sensor.f1_humidity
+vpd_entity: sensor.f1_vpd
+co2_entity: sensor.f1_co2
+lights_entity: switch.f1_lights
+light_hours: 12
+```
+
+**Features:**
+- Automatic week/day calculation from start date
+- Week-by-week Athena Pro Line targets
+- Event scheduling (deleaf, lollipop, harvest)
+- Smart alerts for out-of-range parameters
+- Daily grower checklist
+- Troubleshooting tips from Athena Handbook
+
+**Required Setup:**
+```yaml
+# configuration.yaml
+input_datetime:
+  f1_start_date:
+    name: Flower Room 1 Start Date
+    has_date: true
+    has_time: false
+```
+
+See [REPORT-CARD-SETUP.md](REPORT-CARD-SETUP.md) for complete setup guide.
+
+---
+
+### 4. Switch Control Card
 
 Stylish control panel for all your grow room equipment.
 
@@ -145,7 +184,7 @@ switches:
 
 ---
 
-### 4. Irrigation Control Card
+### 5. Irrigation Control Card
 
 Manage watering zones with soil moisture (VWC) and nutrient (EC) monitoring.
 
@@ -181,7 +220,7 @@ zones:
 
 ---
 
-### 5. Spectrum Sensor Card
+### 6. Spectrum Sensor Card
 
 Visualize light spectrum from AS7341 spectral sensor.
 

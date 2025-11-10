@@ -13,3 +13,4 @@ import './grow-switch-card.js';
 import './grow-irrigation-card.js';
 import './grow-vpd-chart-card.js';
 import './grow-spectrum-card.js';
+import './grow-report-card.js';
