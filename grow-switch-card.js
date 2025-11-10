@@ -1,3 +1,7 @@
+/**
+ * Grow Switch Card v2.1
+ * Supports both simple switch list and tabbed categories
+ */
 class GrowSwitchCard extends HTMLElement {
   constructor() {
     super();
@@ -6,7 +10,13 @@ class GrowSwitchCard extends HTMLElement {
 
   setConfig(config) {
     // Support both old format (switches array) and new format (tabs array)
-    if (config.tabs) {
+    if (config.tabs && config.tabs.length > 0) {
+      // Validate that at least one tab has switches
+      const hasValidTab = config.tabs.some(tab => tab.switches && tab.switches.length > 0);
+      if (!hasValidTab) {
+        throw new Error('Please define at least one switch in your tabs');
+      }
+      
       this.config = {
         ...config,
         title: config.title || 'Equipment Control',

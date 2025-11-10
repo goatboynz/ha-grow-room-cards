@@ -1,3 +1,8 @@
+/**
+ * Grow Camera Card v2.1
+ * Supports both standard Home Assistant cameras and RTSP streams
+ * with scheduled snapshot capture
+ */
 class GrowCameraCard extends HTMLElement {
   constructor() {
     super();
