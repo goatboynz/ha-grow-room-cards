@@ -2,6 +2,7 @@ class GrowReportCard extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+    this.currentTab = 'overview';
   }
 
   setConfig(config) {
@@ -35,11 +36,39 @@ class GrowReportCard extends HTMLElement {
     };
     
     this.render();
+    this.setupTabs();
   }
 
   set hass(hass) {
     this._hass = hass;
     this.updateCard();
+  }
+
+  setupTabs() {
+    this.shadowRoot.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        const tabName = e.target.dataset.tab;
+        this.switchTab(tabName);
+      });
+    });
+  }
+
+  switchTab(tabName) {
+    this.currentTab = tabName;
+    
+    // Update tab active states
+    this.shadowRoot.querySelectorAll('.tab').forEach(tab => {
+      tab.classList.toggle('active', tab.dataset.tab === tabName);
+    });
+    
+    // Update content active states
+    this.shadowRoot.querySelectorAll('.tab-content').forEach(content => {
+      content.classList.remove('active');
+    });
+    this.shadowRoot.getElementById(`${tabName}-content`).classList.add('active');
+    
+    // Update content
+    this.updateTabContent();
   }
 
   // Athena Pro Line schedule data
@@ -203,12 +232,54 @@ class GrowReportCard extends HTMLElement {
           font-weight: 700;
           color: var(--primary-text-color);
         }
+        .tabs {
+          display: flex;
+          border-bottom: 1px solid var(--divider-color);
+          background: var(--secondary-background-color);
+          overflow-x: auto;
+        }
+        .tab {
+          flex: 1;
+          min-width: 100px;
+          padding: 12px;
+          text-align: center;
+          cursor: pointer;
+          font-weight: 600;
+          color: var(--secondary-text-color);
+          transition: all 0.2s;
+          border-bottom: 3px solid transparent;
+          white-space: nowrap;
+        }
+        .tab:hover {
+          background: var(--card-background-color);
+        }
+        .tab.active {
+          color: var(--primary-color);
+          border-bottom-color: var(--primary-color);
+        }
+        .tab-content {
+          display: none;
+        }
+        .tab-content.active {
+          display: block;
+        }
       </style>
       <ha-card>
         <div class="card-header">${this.config.title}</div>
-        <div class="report-content" id="report-content">
-          Loading...
+        
+        <div class="tabs">
+          <div class="tab active" data-tab="overview">Overview</div>
+          <div class="tab" data-tab="targets">Targets</div>
+          <div class="tab" data-tab="schedule">Schedule</div>
+          <div class="tab" data-tab="irrigation">Irrigation</div>
+          <div class="tab" data-tab="checklist">Checklist</div>
         </div>
+        
+        <div class="tab-content active" id="overview-content">Loading...</div>
+        <div class="tab-content" id="targets-content"></div>
+        <div class="tab-content" id="schedule-content"></div>
+        <div class="tab-content" id="irrigation-content"></div>
+        <div class="tab-content" id="checklist-content"></div>
       </ha-card>
     `;
   }
@@ -249,8 +320,35 @@ class GrowReportCard extends HTMLElement {
     // Check for alerts
     const alerts = this.checkAlerts(temp, humidity, vpd, co2, schedule, lightsOn);
 
-    // Build HTML
-    content.innerHTML = this.buildReportHTML(daysIn, week, schedule, temp, humidity, vpd, co2, lightsOn, dli, events, alerts);
+    // Store data for tabs
+    this.reportData = { daysIn, week, schedule, temp, humidity, vpd, co2, lightsOn, dli, events, alerts };
+    
+    // Update current tab content
+    this.updateTabContent();
+  }
+
+  updateTabContent() {
+    if (!this.reportData) return;
+    
+    const { daysIn, week, schedule, temp, humidity, vpd, co2, lightsOn, dli, events, alerts } = this.reportData;
+    
+    switch (this.currentTab) {
+      case 'overview':
+        this.shadowRoot.getElementById('overview-content').innerHTML = this.buildOverviewHTML(daysIn, week, schedule, temp, humidity, vpd, co2, lightsOn, dli, alerts);
+        break;
+      case 'targets':
+        this.shadowRoot.getElementById('targets-content').innerHTML = this.buildTargetsHTML(week, schedule);
+        break;
+      case 'schedule':
+        this.shadowRoot.getElementById('schedule-content').innerHTML = this.buildScheduleHTML(events, week);
+        break;
+      case 'irrigation':
+        this.shadowRoot.getElementById('irrigation-content').innerHTML = this.buildIrrigationHTML();
+        break;
+      case 'checklist':
+        this.shadowRoot.getElementById('checklist-content').innerHTML = this.buildChecklistHTML();
+        break;
+    }
   }
 
   getEntityValue(entityId) {
@@ -338,6 +436,146 @@ class GrowReportCard extends HTMLElement {
     }
     
     return alerts;
+  }
+
+  buildOverviewHTML(daysIn, week, schedule, temp, humidity, vpd, co2, lightsOn, dli, alerts) {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const co2Target = week <= 7 ? '1200-1500' : '500-800';
+    
+    return `
+      <div style="padding: 16px;">
+        <div class="section" style="background: linear-gradient(135deg, rgba(var(--rgb-primary-color), 0.1), transparent); border-left: 4px solid var(--primary-color);">
+          <div style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">
+            Day ${daysIn} of Flower (Week ${week} | ${schedule.phase})
+          </div>
+          <div style="display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px;">
+            <span><strong>Lights:</strong> ${lightsOn ? '💡 ON' : '🌑 OFF'}</span>
+            <span><strong>DLI Target:</strong> ${dli} mol/m²/day</span>
+            <span><strong>Time:</strong> ${timeStr}</span>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">
+            <ha-icon icon="mdi:thermometer"></ha-icon>
+            Environment
+          </div>
+          <div class="info-row">
+            <span class="info-label">Temperature</span>
+            <span class="info-value">${temp.toFixed(1)}°C <span style="color: var(--secondary-text-color); font-weight: normal;">(Target: ${schedule.t_min}-${schedule.t_max}°C)</span></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Humidity</span>
+            <span class="info-value">${humidity.toFixed(1)}% <span style="color: var(--secondary-text-color); font-weight: normal;">(Target: ${schedule.h_min}-${schedule.h_max}%)</span></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">VPD</span>
+            <span class="info-value">${vpd.toFixed(2)} kPa <span style="color: var(--secondary-text-color); font-weight: normal;">(Target: ${schedule.v_min}-${schedule.v_max} kPa)</span></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">CO₂</span>
+            <span class="info-value">${co2} ppm <span style="color: var(--secondary-text-color); font-weight: normal;">(Target: ${co2Target} ppm)</span></span>
+          </div>
+        </div>
+
+        ${this.buildAlertsHTML(alerts)}
+      </div>
+    `;
+  }
+
+  buildTargetsHTML(week, schedule) {
+    return `
+      <div style="padding: 16px;">
+        <div class="section">
+          <div class="section-title">
+            <ha-icon icon="mdi:target"></ha-icon>
+            Athena Pro Targets (Week ${week})
+          </div>
+          
+          <div style="font-weight: 600; margin: 12px 0 8px 0; color: var(--primary-text-color);">Input Targets (Feed Tank)</div>
+          <div class="targets-grid">
+            <div class="target-box">
+              <div class="target-label">Feed EC</div>
+              <div class="target-value">${schedule.feed_ec.toFixed(1)}</div>
+            </div>
+            <div class="target-box">
+              <div class="target-label">Feed pH</div>
+              <div class="target-value">5.8-6.2</div>
+            </div>
+          </div>
+
+          <div style="font-weight: 600; margin: 12px 0 8px 0; color: var(--primary-text-color);">Steering Targets</div>
+          <div class="info-row">
+            <span class="info-label">Crop Steering</span>
+            <span class="info-value">${schedule.steering}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Dryback</span>
+            <span class="info-value">${schedule.dryback_min}-${schedule.dryback_max}% <span style="font-size: 11px;">(Dry to 2nd knuckle)</span></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Runoff</span>
+            <span class="info-value">${schedule.runoff}</span>
+          </div>
+
+          <div style="font-weight: 600; margin: 12px 0 8px 0; color: var(--primary-text-color);">Output Targets (Runoff)</div>
+          <div class="targets-grid">
+            <div class="target-box">
+              <div class="target-label">Runoff EC</div>
+              <div class="target-value">${schedule.runoff_ec_min}-${schedule.runoff_ec_max}</div>
+            </div>
+            <div class="target-box">
+              <div class="target-label">Runoff pH</div>
+              <div class="target-value">5.9-6.3</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  buildChecklistHTML() {
+    return `
+      <div style="padding: 16px;">
+        <div class="section">
+          <div class="section-title">
+            <ha-icon icon="mdi:clipboard-check-outline"></ha-icon>
+            Daily Grower Checklist
+          </div>
+          <div class="alert alert-info">
+            <div class="alert-title">Daily Checks (from Handbook p. 31)</div>
+            <ul class="checklist">
+              <li><ha-icon icon="mdi:thermometer-lines"></ha-icon> Record Temp & Humidity</li>
+              <li><ha-icon icon="mdi:water-opacity"></ha-icon> Check Runoff EC & pH</li>
+              <li><ha-icon icon="mdi:ph"></ha-icon> Confirm Feed Tank pH & EC</li>
+              <li><ha-icon icon="mdi:sprout"></ha-icon> Inspect for Pests or Mildew</li>
+              <li><ha-icon icon="mdi:hand-back-right-outline"></ha-icon> Check Moisture for Dryback</li>
+              <li><ha-icon icon="mdi:leak"></ha-icon> Inspect for Light Leaks</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">
+            <ha-icon icon="mdi:help-rhombus-outline"></ha-icon>
+            Troubleshooting Tips
+          </div>
+          <div class="alert alert-info">
+            <div class="alert-title">Runoff EC (Handbook p. 55)</div>
+            <ul style="margin: 8px 0; padding-left: 20px;">
+              <li><strong>If Runoff EC is HIGH:</strong> Water with additional nutrient solution at your target Feed EC until Runoff EC drops to target.</li>
+              <li><strong>If Runoff EC is LOW:</strong> Increase your Feed EC by 0.5-1.0 on the next feeding. Push less runoff to allow EC to stack.</li>
+            </ul>
+            <div class="alert-title" style="margin-top: 12px;">Watering Technique (Handbook p. 54)</div>
+            <ul style="margin: 8px 0; padding-left: 20px;">
+              <li><strong>Dripper Placement:</strong> Water at the center for instant hydration, then along the edges to encourage root expansion.</li>
+              <li><strong>Prevent Channeling:</strong> Water slowly to prevent channeling. This should take at least 60 seconds to complete.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    `;
   }
 
   buildReportHTML(daysIn, week, schedule, temp, humidity, vpd, co2, lightsOn, dli, events, alerts) {
@@ -493,33 +731,41 @@ class GrowReportCard extends HTMLElement {
 
   buildScheduleHTML(events, week) {
     return `
-      <div class="schedule-item">
-        <span><strong>IPW Spray:</strong> ${week <= 3 ? '<span style="color: #FF9800;">Active</span> (2x/week, ends Wk 3)' : '✅ Done'}</span>
-        <span class="schedule-status" style="color: #FF9800;">${week <= 3 ? 'WARN: Lights OFF, Media WET only!' : ''}</span>
-      </div>
-      <div class="schedule-item">
-        <span><strong>Deleaf 1:</strong> <span class="schedule-date">${events.deleaf1.date}</span></span>
-        <span class="schedule-status">${this.getEventStatusText(events.deleaf1)}</span>
-      </div>
-      <div class="schedule-item">
-        <span><strong>Lollipop:</strong> <span class="schedule-date">${events.lollipop.date}</span></span>
-        <span class="schedule-status">${this.getEventStatusText(events.lollipop)}</span>
-      </div>
-      <div class="schedule-item">
-        <span><strong>Deleaf (Main):</strong> <span class="schedule-date">${events.deleafMain.date}</span></span>
-        <span class="schedule-status">${this.getEventStatusText(events.deleafMain)} (Same day as Lollipop)</span>
-      </div>
-      <div class="schedule-item">
-        <span><strong>Deleaf (Mid):</strong> <span class="schedule-date">${events.deleafMid.date}</span></span>
-        <span class="schedule-status">${this.getEventStatusText(events.deleafMid)}</span>
-      </div>
-      <div class="schedule-item">
-        <span><strong>Deleaf (Final):</strong> <span class="schedule-date">${events.deleafFinal.date}</span></span>
-        <span class="schedule-status">${this.getEventStatusText(events.deleafFinal)}</span>
-      </div>
-      <div class="schedule-item">
-        <span><strong>Harvest:</strong> <span class="schedule-date">${events.harvestStart.date} - ${events.harvestEnd.date}</span></span>
-        <span class="schedule-status">${this.getEventStatusText(events.harvestStart)} (Flush last 3 days)</span>
+      <div style="padding: 16px;">
+        <div class="section">
+          <div class="section-title">
+            <ha-icon icon="mdi:calendar-check"></ha-icon>
+            Grow Schedule
+          </div>
+          <div class="schedule-item">
+            <span><strong>IPW Spray:</strong> ${week <= 3 ? '<span style="color: #FF9800;">Active</span> (2x/week, ends Wk 3)' : '✅ Done'}</span>
+            <span class="schedule-status" style="color: #FF9800;">${week <= 3 ? 'WARN: Lights OFF, Media WET only!' : ''}</span>
+          </div>
+          <div class="schedule-item">
+            <span><strong>Deleaf 1:</strong> <span class="schedule-date">${events.deleaf1.date}</span></span>
+            <span class="schedule-status">${this.getEventStatusText(events.deleaf1)}</span>
+          </div>
+          <div class="schedule-item">
+            <span><strong>Lollipop:</strong> <span class="schedule-date">${events.lollipop.date}</span></span>
+            <span class="schedule-status">${this.getEventStatusText(events.lollipop)}</span>
+          </div>
+          <div class="schedule-item">
+            <span><strong>Deleaf (Main):</strong> <span class="schedule-date">${events.deleafMain.date}</span></span>
+            <span class="schedule-status">${this.getEventStatusText(events.deleafMain)} (Same day as Lollipop)</span>
+          </div>
+          <div class="schedule-item">
+            <span><strong>Deleaf (Mid):</strong> <span class="schedule-date">${events.deleafMid.date}</span></span>
+            <span class="schedule-status">${this.getEventStatusText(events.deleafMid)}</span>
+          </div>
+          <div class="schedule-item">
+            <span><strong>Deleaf (Final):</strong> <span class="schedule-date">${events.deleafFinal.date}</span></span>
+            <span class="schedule-status">${this.getEventStatusText(events.deleafFinal)}</span>
+          </div>
+          <div class="schedule-item">
+            <span><strong>Harvest:</strong> <span class="schedule-date">${events.harvestStart.date} - ${events.harvestEnd.date}</span></span>
+            <span class="schedule-status">${this.getEventStatusText(events.harvestStart)} (Flush last 3 days)</span>
+          </div>
+        </div>
       </div>
     `;
   }
@@ -535,7 +781,7 @@ class GrowReportCard extends HTMLElement {
   }
 
   buildIrrigationHTML() {
-    let html = '';
+    let zoneInfo = '';
     
     if (this.config.zone_1_entity) {
       const zone1 = this._hass.states[this.config.zone_1_entity];
@@ -546,7 +792,7 @@ class GrowReportCard extends HTMLElement {
         const hoursAgo = Math.floor(minutesAgo / 60);
         const timeAgo = hoursAgo > 0 ? `${hoursAgo}h ago` : `${minutesAgo}m ago`;
         
-        html += `
+        zoneInfo += `
           <div class="info-row">
             <span class="info-label">Zone 1 Last Fed</span>
             <span class="info-value">${timeAgo}</span>
@@ -564,7 +810,7 @@ class GrowReportCard extends HTMLElement {
         const hoursAgo = Math.floor(minutesAgo / 60);
         const timeAgo = hoursAgo > 0 ? `${hoursAgo}h ago` : `${minutesAgo}m ago`;
         
-        html += `
+        zoneInfo += `
           <div class="info-row">
             <span class="info-label">Zone 2 Last Fed</span>
             <span class="info-value">${timeAgo}</span>
@@ -573,7 +819,21 @@ class GrowReportCard extends HTMLElement {
       }
     }
     
-    return html || '<div class="info-row"><span class="info-label">No irrigation zones configured</span></div>';
+    if (!zoneInfo) {
+      zoneInfo = '<div class="info-row"><span class="info-label">No irrigation zones configured</span></div>';
+    }
+    
+    return `
+      <div style="padding: 16px;">
+        <div class="section">
+          <div class="section-title">
+            <ha-icon icon="mdi:water-pump"></ha-icon>
+            Irrigation Status
+          </div>
+          ${zoneInfo}
+        </div>
+      </div>
+    `;
   }
 
   buildAlertsHTML(alerts) {

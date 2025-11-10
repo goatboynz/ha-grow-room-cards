@@ -98,6 +98,91 @@ class GrowEnvironmentCard extends HTMLElement {
         .metric-card.vpd {
           background: linear-gradient(135deg, #FFD93D 0%, #F6C90E 100%);
         }
+        .modal-overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.7);
+          z-index: 1000;
+          align-items: center;
+          justify-content: center;
+          animation: fadeIn 0.2s ease;
+        }
+        .modal-overlay.show {
+          display: flex;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .modal-content {
+          background: var(--card-background-color);
+          border-radius: 16px;
+          padding: 24px;
+          max-width: 600px;
+          width: 90%;
+          max-height: 80vh;
+          overflow-y: auto;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+          animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+          from { transform: translateY(50px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+        }
+        .modal-title {
+          font-size: 22px;
+          font-weight: 700;
+          color: var(--primary-text-color);
+        }
+        .modal-close {
+          background: var(--secondary-background-color);
+          border: none;
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s;
+        }
+        .modal-close:hover {
+          background: var(--primary-color);
+          color: white;
+        }
+        .modal-stats {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 12px;
+          margin-bottom: 20px;
+        }
+        .modal-stat {
+          text-align: center;
+          padding: 12px;
+          background: var(--secondary-background-color);
+          border-radius: 8px;
+        }
+        .modal-stat-label {
+          font-size: 11px;
+          text-transform: uppercase;
+          color: var(--secondary-text-color);
+          margin-bottom: 4px;
+        }
+        .modal-stat-value {
+          font-size: 20px;
+          font-weight: 700;
+          color: var(--primary-color);
+        }
         .metric-label {
           font-size: 11px;
           text-transform: uppercase;
@@ -171,22 +256,32 @@ class GrowEnvironmentCard extends HTMLElement {
         }
       </style>
       <ha-card>
-        <div class="main-view" id="main-view">
-          <div class="card-header">${this.config.title}</div>
-          <div class="metrics-grid" id="metrics-grid"></div>
-        </div>
-        <div class="history-view" id="history-view">
-          <div class="history-header">
-            <div class="history-title" id="history-title"></div>
-            <button class="back-button" id="back-button">Back</button>
-          </div>
-          <canvas id="history-canvas"></canvas>
-        </div>
+        <div class="card-header">${this.config.title}</div>
+        <div class="metrics-grid" id="metrics-grid"></div>
       </ha-card>
+      
+      <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-content">
+          <div class="modal-header">
+            <div class="modal-title" id="modal-title"></div>
+            <button class="modal-close" id="modal-close">
+              <ha-icon icon="mdi:close"></ha-icon>
+            </button>
+          </div>
+          <div class="modal-stats" id="modal-stats"></div>
+          <canvas id="modal-canvas" width="600" height="300"></canvas>
+        </div>
+      </div>
     `;
 
-    this.shadowRoot.getElementById('back-button').addEventListener('click', () => {
-      this.showMainView();
+    this.shadowRoot.getElementById('modal-close').addEventListener('click', () => {
+      this.closeModal();
+    });
+    
+    this.shadowRoot.getElementById('modal-overlay').addEventListener('click', (e) => {
+      if (e.target.id === 'modal-overlay') {
+        this.closeModal();
+      }
     });
   }
 
@@ -239,13 +334,9 @@ class GrowEnvironmentCard extends HTMLElement {
     const entityId = this.config.entities[type];
     if (!entityId) return;
 
-    this.showingHistory = type;
-    const mainView = this.shadowRoot.getElementById('main-view');
-    const historyView = this.shadowRoot.getElementById('history-view');
-    const historyTitle = this.shadowRoot.getElementById('history-title');
-
-    mainView.style.display = 'none';
-    historyView.classList.add('active');
+    const modal = this.shadowRoot.getElementById('modal-overlay');
+    const modalTitle = this.shadowRoot.getElementById('modal-title');
+    const modalStats = this.shadowRoot.getElementById('modal-stats');
 
     const labels = {
       temperature: 'Temperature History',
@@ -253,19 +344,63 @@ class GrowEnvironmentCard extends HTMLElement {
       co2: 'CO₂ History',
       vpd: 'VPD History'
     };
-    historyTitle.textContent = labels[type];
+    modalTitle.textContent = labels[type];
 
+    // Show modal
+    modal.classList.add('show');
+
+    // Fetch and display history
     const history = await this.fetchHistory(entityId);
-    this.drawHistoryChart(history, type);
+    this.displayModalStats(history, type);
+    this.drawModalChart(history, type);
   }
 
-  showMainView() {
-    const mainView = this.shadowRoot.getElementById('main-view');
-    const historyView = this.shadowRoot.getElementById('history-view');
+  closeModal() {
+    const modal = this.shadowRoot.getElementById('modal-overlay');
+    modal.classList.remove('show');
+  }
 
-    mainView.style.display = 'block';
-    historyView.classList.remove('active');
-    this.showingHistory = null;
+  displayModalStats(history, type) {
+    const statsContainer = this.shadowRoot.getElementById('modal-stats');
+    
+    if (!history || history.length === 0) {
+      statsContainer.innerHTML = '<div style="grid-column: 1/-1; text-align: center;">No data available</div>';
+      return;
+    }
+
+    const values = history.map(h => parseFloat(h.state)).filter(v => !isNaN(v));
+    const current = values[values.length - 1];
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const avg = values.reduce((a, b) => a + b, 0) / values.length;
+
+    const units = {
+      temperature: '°C',
+      humidity: '%',
+      co2: 'ppm',
+      vpd: 'kPa'
+    };
+    const unit = units[type] || '';
+    const decimals = type === 'co2' ? 0 : type === 'vpd' ? 2 : 1;
+
+    statsContainer.innerHTML = `
+      <div class="modal-stat">
+        <div class="modal-stat-label">Current</div>
+        <div class="modal-stat-value">${current.toFixed(decimals)}${unit}</div>
+      </div>
+      <div class="modal-stat">
+        <div class="modal-stat-label">Min</div>
+        <div class="modal-stat-value">${min.toFixed(decimals)}${unit}</div>
+      </div>
+      <div class="modal-stat">
+        <div class="modal-stat-label">Max</div>
+        <div class="modal-stat-value">${max.toFixed(decimals)}${unit}</div>
+      </div>
+      <div class="modal-stat">
+        <div class="modal-stat-label">Average</div>
+        <div class="modal-stat-value">${avg.toFixed(decimals)}${unit}</div>
+      </div>
+    `;
   }
 
   drawHistoryChart(history, type) {
