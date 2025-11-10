@@ -5,13 +5,23 @@ class GrowSwitchCard extends HTMLElement {
   }
 
   setConfig(config) {
-    if (!config.switches || config.switches.length === 0) {
-      throw new Error('Please define at least one switch');
+    // Support both old format (switches array) and new format (tabs array)
+    if (config.tabs) {
+      this.config = {
+        ...config,
+        title: config.title || 'Equipment Control',
+        useTabs: true
+      };
+      this.currentTab = config.tabs[0].name;
+    } else if (config.switches && config.switches.length > 0) {
+      this.config = {
+        ...config,
+        title: config.title || 'Equipment Control',
+        useTabs: false
+      };
+    } else {
+      throw new Error('Please define either switches or tabs');
     }
-    this.config = {
-      ...config,
-      title: config.title || 'Equipment Control'
-    };
     this.render();
   }
 
@@ -34,6 +44,30 @@ class GrowSwitchCard extends HTMLElement {
           padding: 16px;
           color: var(--primary-text-color);
           border-bottom: 1px solid var(--divider-color);
+        }
+        .tabs {
+          display: flex;
+          border-bottom: 1px solid var(--divider-color);
+          background: var(--secondary-background-color);
+          overflow-x: auto;
+        }
+        .tab {
+          flex: 1;
+          min-width: 100px;
+          padding: 12px;
+          text-align: center;
+          cursor: pointer;
+          font-weight: 600;
+          color: var(--secondary-text-color);
+          transition: all 0.2s;
+          border-bottom: 3px solid transparent;
+        }
+        .tab:hover {
+          background: var(--card-background-color);
+        }
+        .tab.active {
+          color: var(--primary-color);
+          border-bottom-color: var(--primary-color);
         }
         .switches-grid {
           display: grid;
@@ -109,16 +143,47 @@ class GrowSwitchCard extends HTMLElement {
       </style>
       <ha-card>
         <div class="card-header">${this.config.title}</div>
+        ${this.config.useTabs ? '<div class="tabs" id="tabs"></div>' : ''}
         <div class="switches-grid" id="switches-grid"></div>
       </ha-card>
     `;
+    
+    if (this.config.useTabs) {
+      this.setupTabs();
+    }
+  }
+
+  setupTabs() {
+    const tabsContainer = this.shadowRoot.getElementById('tabs');
+    if (!tabsContainer) return;
+
+    tabsContainer.innerHTML = this.config.tabs.map(tab => 
+      `<div class="tab ${tab.name === this.currentTab ? 'active' : ''}" data-tab="${tab.name}">${tab.name}</div>`
+    ).join('');
+
+    tabsContainer.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        this.currentTab = e.target.dataset.tab;
+        this.setupTabs();
+        this.updateCard();
+      });
+    });
   }
 
   updateCard() {
     if (!this._hass) return;
 
     const grid = this.shadowRoot.getElementById('switches-grid');
-    const switches = this.config.switches.map(sw => this.createSwitch(sw)).join('');
+    
+    let switchesToShow;
+    if (this.config.useTabs) {
+      const currentTabConfig = this.config.tabs.find(t => t.name === this.currentTab);
+      switchesToShow = currentTabConfig ? currentTabConfig.switches : [];
+    } else {
+      switchesToShow = this.config.switches;
+    }
+
+    const switches = switchesToShow.map(sw => this.createSwitch(sw)).join('');
     grid.innerHTML = switches;
 
     // Add click handlers
@@ -176,10 +241,21 @@ class GrowSwitchCard extends HTMLElement {
 
   static getStubConfig() {
     return {
-      switches: [
-        { entity: 'switch.grow_light', name: 'Grow Light', type: 'light' },
-        { entity: 'switch.exhaust_fan', name: 'Exhaust Fan', type: 'fan' },
-        { entity: 'switch.humidifier', name: 'Humidifier', type: 'humidifier' }
+      tabs: [
+        {
+          name: 'Lights',
+          switches: [
+            { entity: 'switch.main_light', name: 'Main Light', type: 'light' },
+            { entity: 'switch.side_light', name: 'Side Light', type: 'light' }
+          ]
+        },
+        {
+          name: 'Climate',
+          switches: [
+            { entity: 'switch.exhaust_fan', name: 'Exhaust', type: 'fan' },
+            { entity: 'switch.humidifier', name: 'Humidifier', type: 'humidifier' }
+          ]
+        }
       ],
       title: 'Equipment Control'
     };

@@ -15,14 +15,14 @@ class GrowCameraCard extends HTMLElement {
     this.config = {
       ...config,
       title: config.title || 'Grow Camera',
-      show_motion_detection: config.show_motion_detection !== false,
-      show_snapshots: config.show_snapshots !== false,
-      snapshot_count: config.snapshot_count || 10,
-      refresh_interval: config.refresh_interval || 5000
+      refresh_interval: config.refresh_interval || 5000,
+      timelapse_times: config.timelapse_times || ['06:00', '12:00', '18:00', '00:00'],
+      timelapse_storage: config.timelapse_storage || '/config/www/timelapse/'
     };
     
     this.render();
     this.startRefresh();
+    this.scheduleTimelapseCaptures();
   }
 
   set hass(hass) {
@@ -73,39 +73,26 @@ class GrowCameraCard extends HTMLElement {
           align-items: center;
           font-size: 12px;
         }
-        .controls {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-          gap: 12px;
-          padding: 16px;
+        .timelapse-info {
+          padding: 12px 16px;
           background: var(--secondary-background-color);
+          border-top: 1px solid var(--divider-color);
+          font-size: 12px;
+          color: var(--secondary-text-color);
         }
-        .control-button {
+        .timelapse-schedule {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+          margin-top: 8px;
+        }
+        .time-badge {
+          padding: 4px 10px;
           background: var(--primary-color);
           color: white;
-          border: none;
-          padding: 12px;
-          border-radius: 8px;
-          cursor: pointer;
+          border-radius: 12px;
+          font-size: 11px;
           font-weight: 600;
-          font-size: 13px;
-          transition: all 0.2s;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 6px;
-        }
-        .control-button:hover {
-          opacity: 0.8;
-          transform: translateY(-2px);
-        }
-        .control-button:active {
-          transform: translateY(0);
-        }
-        .control-button.secondary {
-          background: var(--secondary-background-color);
-          color: var(--primary-text-color);
-          border: 1px solid var(--divider-color);
         }
         .snapshots-container {
           padding: 16px;
@@ -265,71 +252,11 @@ class GrowCameraCard extends HTMLElement {
             </div>
           </div>
           
-          <div class="controls">
-            <button class="control-button" id="snapshot-btn">
-              <ha-icon icon="mdi:camera"></ha-icon>
-              Snapshot
-            </button>
-            <button class="control-button secondary" id="view-snapshots-btn">
-              <ha-icon icon="mdi:image-multiple"></ha-icon>
-              Gallery
-            </button>
-            <button class="control-button secondary" id="timelapse-btn">
-              <ha-icon icon="mdi:timelapse"></ha-icon>
-              Timelapse
-            </button>
-            <button class="control-button secondary" id="compare-btn">
-              <ha-icon icon="mdi:compare"></ha-icon>
-              Compare
-            </button>
-          </div>
-        </div>
-
-        <div class="snapshots-container" id="snapshots-view">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <h3 style="margin: 0;">Snapshot Gallery</h3>
-            <button class="control-button secondary" id="back-from-snapshots">
-              <ha-icon icon="mdi:arrow-left"></ha-icon>
-              Back
-            </button>
-          </div>
-          <div class="snapshots-grid" id="snapshots-grid"></div>
-        </div>
-
-        <div class="timelapse-view" id="timelapse-view">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <h3 style="margin: 0;">Timelapse</h3>
-            <button class="control-button secondary" id="back-from-timelapse">
-              <ha-icon icon="mdi:arrow-left"></ha-icon>
-              Back
-            </button>
-          </div>
-          <div class="camera-container">
-            <img class="camera-image" id="timelapse-image" alt="Timelapse frame">
-          </div>
-          <div class="timelapse-controls">
-            <button class="timelapse-button" id="play-timelapse">
-              <ha-icon icon="mdi:play"></ha-icon>
-            </button>
-            <input type="range" class="timelapse-slider" id="timelapse-slider" min="0" max="100" value="0">
-            <span id="timelapse-counter">0 / 0</span>
-          </div>
-        </div>
-
-        <div class="comparison-container" id="comparison-view">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <h3 style="margin: 0;">Before/After Comparison</h3>
-            <button class="control-button secondary" id="back-from-comparison">
-              <ha-icon icon="mdi:arrow-left"></ha-icon>
-              Back
-            </button>
-          </div>
-          <div class="comparison-slider" id="comparison-slider">
-            <div class="comparison-images">
-              <img id="comparison-before" alt="Before">
-              <div class="comparison-after" id="comparison-after-container">
-                <img id="comparison-after" alt="After">
-              </div>
+          <div class="timelapse-info">
+            <strong>📸 Automatic Timelapse Schedule</strong>
+            <div class="timelapse-schedule" id="timelapse-schedule"></div>
+            <div style="margin-top: 8px; font-size: 11px;">
+              Photos are automatically captured at scheduled times and saved to ${this.config.timelapse_storage}
             </div>
           </div>
         </div>
@@ -340,46 +267,32 @@ class GrowCameraCard extends HTMLElement {
   }
 
   setupEventListeners() {
-    // Snapshot button
-    this.shadowRoot.getElementById('snapshot-btn').addEventListener('click', () => {
-      this.takeSnapshot();
-    });
+    // Render timelapse schedule
+    const scheduleEl = this.shadowRoot.getElementById('timelapse-schedule');
+    scheduleEl.innerHTML = this.config.timelapse_times.map(time => 
+      `<span class="time-badge">${time}</span>`
+    ).join('');
+  }
 
-    // View snapshots
-    this.shadowRoot.getElementById('view-snapshots-btn').addEventListener('click', () => {
-      this.showSnapshots();
-    });
+  scheduleTimelapseCaptures() {
+    // Check every minute if it's time to capture
+    setInterval(() => {
+      const now = new Date();
+      const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      
+      if (this.config.timelapse_times.includes(currentTime)) {
+        this.captureTimelapsePhoto();
+      }
+    }, 60000); // Check every minute
+  }
 
-    // Timelapse
-    this.shadowRoot.getElementById('timelapse-btn').addEventListener('click', () => {
-      this.showTimelapse();
-    });
-
-    // Compare
-    this.shadowRoot.getElementById('compare-btn').addEventListener('click', () => {
-      this.showComparison();
-    });
-
-    // Back buttons
-    this.shadowRoot.getElementById('back-from-snapshots').addEventListener('click', () => {
-      this.showMainView();
-    });
-
-    this.shadowRoot.getElementById('back-from-timelapse').addEventListener('click', () => {
-      this.showMainView();
-    });
-
-    this.shadowRoot.getElementById('back-from-comparison').addEventListener('click', () => {
-      this.showMainView();
-    });
-
-    // Timelapse controls
-    this.shadowRoot.getElementById('play-timelapse').addEventListener('click', () => {
-      this.toggleTimelapsePlay();
-    });
-
-    this.shadowRoot.getElementById('timelapse-slider').addEventListener('input', (e) => {
-      this.updateTimelapseFrame(parseInt(e.target.value));
+  captureTimelapsePhoto() {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const filename = `${this.config.timelapse_storage}${this.config.camera_entity.split('.')[1]}_${timestamp}.jpg`;
+    
+    this._hass.callService('camera', 'snapshot', {
+      entity_id: this.config.camera_entity,
+      filename: filename
     });
   }
 
@@ -458,109 +371,6 @@ class GrowCameraCard extends HTMLElement {
     container.innerHTML = '<div class="no-camera">Camera not available</div>';
   }
 
-  takeSnapshot() {
-    if (!this._hass) return;
-
-    this._hass.callService('camera', 'snapshot', {
-      entity_id: this.config.camera_entity,
-      filename: `/config/www/snapshots/${this.config.camera_entity.split('.')[1]}_${Date.now()}.jpg`
-    });
-
-    // Show notification
-    this._hass.callService('persistent_notification', 'create', {
-      message: 'Snapshot saved',
-      title: 'Camera Snapshot'
-    });
-  }
-
-  showSnapshots() {
-    this.shadowRoot.getElementById('main-view').style.display = 'none';
-    this.shadowRoot.getElementById('snapshots-view').classList.add('active');
-    this.loadSnapshots();
-  }
-
-  showTimelapse() {
-    this.shadowRoot.getElementById('main-view').style.display = 'none';
-    this.shadowRoot.getElementById('timelapse-view').classList.add('active');
-    this.showingTimelapse = true;
-    this.loadTimelapseFrames();
-  }
-
-  showComparison() {
-    this.shadowRoot.getElementById('main-view').style.display = 'none';
-    this.shadowRoot.getElementById('comparison-view').classList.add('active');
-    this.loadComparisonImages();
-  }
-
-  showMainView() {
-    this.shadowRoot.getElementById('main-view').style.display = 'block';
-    this.shadowRoot.getElementById('snapshots-view').classList.remove('active');
-    this.shadowRoot.getElementById('timelapse-view').classList.remove('active');
-    this.shadowRoot.getElementById('comparison-view').classList.remove('active');
-    this.showingTimelapse = false;
-    
-    if (this.timelapseInterval) {
-      clearInterval(this.timelapseInterval);
-      this.timelapseInterval = null;
-    }
-  }
-
-  loadSnapshots() {
-    // This would load actual snapshots from storage
-    // For now, show placeholder
-    const grid = this.shadowRoot.getElementById('snapshots-grid');
-    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--secondary-text-color);">No snapshots available. Take some snapshots to see them here.</div>';
-  }
-
-  loadTimelapseFrames() {
-    // This would load actual timelapse frames
-    // For now, show current camera
-    const imageEl = this.shadowRoot.getElementById('timelapse-image');
-    const cameraEntity = this._hass.states[this.config.camera_entity];
-    
-    if (cameraEntity && cameraEntity.attributes.entity_picture) {
-      imageEl.src = cameraEntity.attributes.entity_picture;
-    }
-    
-    this.shadowRoot.getElementById('timelapse-counter').textContent = '0 / 0';
-  }
-
-  toggleTimelapsePlay() {
-    const playBtn = this.shadowRoot.getElementById('play-timelapse');
-    
-    if (this.timelapseInterval) {
-      clearInterval(this.timelapseInterval);
-      this.timelapseInterval = null;
-      playBtn.innerHTML = '<ha-icon icon="mdi:play"></ha-icon>';
-    } else {
-      playBtn.innerHTML = '<ha-icon icon="mdi:pause"></ha-icon>';
-      this.timelapseInterval = setInterval(() => {
-        const slider = this.shadowRoot.getElementById('timelapse-slider');
-        let value = parseInt(slider.value) + 1;
-        if (value > parseInt(slider.max)) {
-          value = 0;
-        }
-        slider.value = value;
-        this.updateTimelapseFrame(value);
-      }, 200);
-    }
-  }
-
-  updateTimelapseFrame(index) {
-    this.currentSnapshotIndex = index;
-    this.shadowRoot.getElementById('timelapse-counter').textContent = `${index} / ${this.snapshots.length}`;
-  }
-
-  loadComparisonImages() {
-    // Load before/after images
-    const cameraEntity = this._hass.states[this.config.camera_entity];
-    
-    if (cameraEntity && cameraEntity.attributes.entity_picture) {
-      this.shadowRoot.getElementById('comparison-before').src = cameraEntity.attributes.entity_picture;
-      this.shadowRoot.getElementById('comparison-after').src = cameraEntity.attributes.entity_picture;
-    }
-  }
-
   disconnectedCallback() {
     if (this.refreshInterval) {
       clearInterval(this.refreshInterval);
@@ -577,10 +387,9 @@ class GrowCameraCard extends HTMLElement {
   static getStubConfig() {
     return {
       camera_entity: 'camera.grow_room',
-      motion_entity: 'binary_sensor.grow_room_motion',
-      show_motion_detection: true,
-      show_snapshots: true,
-      refresh_interval: 5000
+      refresh_interval: 5000,
+      timelapse_times: ['06:00', '12:00', '18:00', '00:00'],
+      timelapse_storage: '/config/www/timelapse/'
     };
   }
 }

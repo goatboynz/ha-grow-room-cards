@@ -19,3 +19,4 @@ import './grow-nutrient-card.js';
 import './grow-alert-card.js';
 import './grow-calendar-card.js';
 import './grow-journal-card.js';
+import './grow-settings-card.js';
