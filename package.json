@@ -1,0 +1,28 @@
+{
+  "name": "ha-grow-room-cards",
+  "version": "1.0.0",
+  "description": "Complete suite of custom cards for grow room monitoring and control in Home Assistant",
+  "main": "grow-room-cards.js",
+  "scripts": {
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/goatboynz/ha-grow-room-cards.git"
+  },
+  "keywords": [
+    "home-assistant",
+    "custom-card",
+    "grow-room",
+    "vpd",
+    "irrigation",
+    "environment",
+    "monitoring"
+  ],
+  "author": "goatboynz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/goatboynz/ha-grow-room-cards/issues"
+  },
+  "homepage": "https://github.com/goatboynz/ha-grow-room-cards#readme"
+}
