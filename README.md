@@ -8,10 +8,11 @@ A complete suite of custom cards for monitoring and controlling your grow room e
 
 ![Grow Room Cards](https://img.shields.io/badge/Cards-5-green) ![Status](https://img.shields.io/badge/Status-Stable-success)
 
-## 🌱 Cards Included (11 Total)
+## 🌱 Cards Included (12 Total)
 
 | Card | Type | Purpose |
 |------|------|---------|
+| 🌸 **Room Overview** | `grow-room-overview-card` | Complete room dashboard with metrics & alerts |
 | 🌡️ **Environment Monitor** | `grow-environment-card` | Monitor temp, humidity, CO2, VPD with history |
 | 📊 **VPD Chart** | `grow-vpd-chart-card` | Interactive VPD analysis with color zones |
 | 📋 **Grow Report** | `grow-report-card` | Daily/weekly report with Athena Pro Line schedule |
