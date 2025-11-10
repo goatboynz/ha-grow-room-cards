@@ -14,3 +14,6 @@ import './grow-irrigation-card.js';
 import './grow-vpd-chart-card.js';
 import './grow-spectrum-card.js';
 import './grow-report-card.js';
+import './grow-camera-card.js';
+import './grow-nutrient-card.js';
+import './grow-alert-card.js';

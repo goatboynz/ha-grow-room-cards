@@ -15,6 +15,9 @@ A complete suite of custom cards for monitoring and controlling your grow room e
 | 🌡️ **Environment Monitor** | `grow-environment-card` | Monitor temp, humidity, CO2, VPD with history |
 | 📊 **VPD Chart** | `grow-vpd-chart-card` | Interactive VPD analysis with color zones |
 | 📋 **Grow Report** | `grow-report-card` | Daily/weekly report with Athena Pro Line schedule |
+| 📸 **Camera/Timelapse** | `grow-camera-card` | Camera monitoring with timelapse and snapshots |
+| 🧪 **Nutrient Dosing** | `grow-nutrient-card` | EC/pH control with automated dosing |
+| 🔔 **Alert Manager** | `grow-alert-card` | Centralized alert management for all rooms |
 | 🌈 **Spectrum Sensor** | `grow-spectrum-card` | AS7341 spectral visualization |
 | 💧 **Irrigation Control** | `grow-irrigation-card` | Manage zones with VWC and EC monitoring |
 | 🔌 **Switch Control** | `grow-switch-card` | Control lights, fans, and equipment |
