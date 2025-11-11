@@ -1,137 +1,92 @@
 # Example Configurations for Grow Room Cards
-# Copy and paste these into your Lovelace dashboard
-
-# ============================================
-# CAMERA CARD - RTSP Configuration
-# ============================================
-# Note: RTSP URLs should be on a single line
-# Replace IP, username, password, and channel with your values
-
-- type: custom:grow-camera-card
-  title: F2 Camera
-  rtsp_url: "rtsp://192.168.1.228:554/user=goatboy_password=SmokeupDab710_channel=6_stream=1.sdp"
-  rtsp_username: goatboy
-  rtsp_password: SmokeupDab710
-  rtsp_snapshot_url: "http://192.168.1.228/snapshot.jpg"
-  snapshot_times:
-    - "06:00"
-    - "12:00"
-    - "18:00"
-    - "00:00"
-  snapshot_storage: /config/www/snapshots/
-
-# Alternative: If your camera has an HTTP snapshot endpoint
-- type: custom:grow-camera-card
-  title: F2 Camera (HTTP Snapshot)
-  rtsp_url: "rtsp://192.168.1.228:554/user=goatboy_password=SmokeupDab710_channel=6_stream=1.sdp"
-  rtsp_snapshot_url: "http://192.168.1.228:8080/cgi-bin/snapshot.cgi?channel=6"
-  snapshot_times:
-    - "06:00"
-    - "12:00"
-    - "18:00"
-    - "00:00"
-  snapshot_storage: /config/www/snapshots/
-
-# ============================================
-# SWITCH CARD - With Tabs/Categories
-# ============================================
-
-- type: custom:grow-switch-card
-  title: F2 Equipment Control
-  tabs:
-    - name: Lighting
-      switches:
-        - entity: switch.f2_light
-          name: Main Lights
-          icon: "mdi:lightbulb"
-        - entity: switch.f2_lights1
-          name: UV Lights
-          icon: "mdi:lightbulb-outline"
-    
-    - name: Climate
-      switches:
-        - entity: switch.f2_exhaust_fan
-          name: Exhaust Fan
-          icon: "mdi:fan"
-        - entity: switch.f2_humidifier
-          name: Humidifier
-          icon: "mdi:water"
-    
-    - name: Irrigation
-      switches:
-        - entity: switch.f2_irrigation_pump
-          name: Main Pump
-          icon: "mdi:water-pump"
-
-# ============================================
-# SWITCH CARD - Simple (No Tabs)
-# ============================================
-
-- type: custom:grow-switch-card
-  title: F2 Equipment
-  switches:
-    - entity: switch.f2_light
-      name: Main Lights
-      icon: "mdi:lightbulb"
-    - entity: switch.f2_lights1
-      name: UV Lights
-      icon: "mdi:lightbulb-outline"
-    - entity: switch.f2_exhaust_fan
-      name: Exhaust Fan
-      icon: "mdi:fan"
-    - entity: switch.f2_humidifier
-      name: Humidifier
-      icon: "mdi:water"
-    - entity: switch.f2_irrigation_pump
-      name: Main Pump
-      icon: "mdi:water-pump"
+# Copy these into your Lovelace dashboard
 
 # ============================================
 # ROOM OVERVIEW CARD
 # ============================================
-
 - type: custom:grow-room-overview-card
-  title: F2 Flowering Room
-  room_name: F2 Flowering Room
-  start_date_entity: input_datetime.f2_flower_start
-  lights_entity: switch.f2_light
-  temperature_entity: sensor.f2_temperature
-  humidity_entity: sensor.f2_humidity
-  vpd_entity: sensor.f2_vpd
-  co2_entity: sensor.f2_co2
+  title: Main Tent
+  room_name: Main Tent
+  start_date_entity: input_datetime.flower_start
+  lights_entity: light.grow_lights
+  temperature_entity: sensor.temperature
+  humidity_entity: sensor.humidity
+  vpd_entity: sensor.vpd
+  co2_entity: sensor.co2
   show_sparklines: true
 
 # ============================================
 # ENVIRONMENT MONITOR CARD
 # ============================================
-
 - type: custom:grow-environment-card
-  title: F2 Environment
+  title: Environment
   entities:
-    temperature: sensor.f2_temperature
-    humidity: sensor.f2_humidity
-    vpd: sensor.f2_vpd
-    co2: sensor.f2_co2
+    temperature: sensor.temperature
+    humidity: sensor.humidity
+    vpd: sensor.vpd
+    co2: sensor.co2
+
+# ============================================
+# SWITCH CARD - With Tabs
+# ============================================
+- type: custom:grow-switch-card
+  title: Equipment Control
+  tabs:
+    - name: Lighting
+      switches:
+        - entity: light.grow_lights
+          name: Main Lights
+          icon: "mdi:lightbulb"
+    
+    - name: Climate
+      switches:
+        - entity: switch.exhaust_fan
+          name: Exhaust Fan
+          icon: "mdi:fan"
+        - entity: switch.humidifier
+          name: Humidifier
+          icon: "mdi:water"
+
+# ============================================
+# CAMERA CARD - RTSP
+# ============================================
+- type: custom:grow-camera-card
+  title: Grow Camera
+  rtsp_url: "rtsp://192.168.1.100:554/stream"
+  rtsp_username: admin
+  rtsp_password: password
+  rtsp_snapshot_url: "http://192.168.1.100/snapshot.jpg"
+  snapshot_times:
+    - "06:00"
+    - "12:00"
+    - "18:00"
+    - "00:00"
+  snapshot_storage: /config/www/snapshots/
 
 # ============================================
 # GROW REPORT CARD
 # ============================================
-
 - type: custom:grow-report-card
-  title: F2 Grow Report
-  room_name: F2 Flowering Room
-  start_date_entity: input_datetime.f2_flower_start
-  temperature_entity: sensor.f2_temperature
-  humidity_entity: sensor.f2_humidity
-  vpd_entity: sensor.f2_vpd
-  co2_entity: sensor.f2_co2
-  lights_entity: switch.f2_light
+  title: Grow Report
+  room_name: Main Tent
+  start_date_entity: input_datetime.flower_start
+  temperature_entity: sensor.temperature
+  humidity_entity: sensor.humidity
+  vpd_entity: sensor.vpd
+  co2_entity: sensor.co2
+  lights_entity: light.grow_lights
   light_hours: 12
 
 # ============================================
-# REQUIRED SHELL COMMAND FOR RTSP SNAPSHOTS
+# REQUIRED CONFIGURATION
 # ============================================
-# Add this to your configuration.yaml:
+# Add to configuration.yaml:
+
+# input_datetime:
+#   flower_start:
+#     name: Flower Start Date
+#     has_date: true
+#     has_time: false
 
 # shell_command:
 #   capture_rtsp_snapshot: >
@@ -139,24 +94,3 @@
 #     -i {{ rtsp_url }} 
 #     -frames:v 1 
 #     {{ filename }}
-
-# ============================================
-# REQUIRED INPUT HELPERS
-# ============================================
-# Add these to your configuration.yaml:
-
-# input_datetime:
-#   f2_flower_start:
-#     name: F2 Flower Start Date
-#     has_date: true
-#     has_time: false
-
-# input_select:
-#   f2_grow_stage:
-#     name: F2 Grow Stage
-#     options:
-#       - Seedling
-#       - Vegetative
-#       - Flowering
-#       - Harvest
-#     initial: Flowering

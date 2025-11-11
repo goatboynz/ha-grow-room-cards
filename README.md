@@ -1,246 +1,212 @@
 # Grow Room Cards for Home Assistant
 
+A comprehensive suite of custom Lovelace cards designed specifically for cannabis cultivation monitoring and automation in Home Assistant.
+
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
 [![GitHub release](https://img.shields.io/github/release/goatboynz/ha-grow-room-cards.svg)](https://github.com/goatboynz/ha-grow-room-cards/releases)
 [![License](https://img.shields.io/github/license/goatboynz/ha-grow-room-cards.svg)](LICENSE)
 
-A complete suite of custom cards for monitoring and controlling your grow room environment. All cards share a unified, modern design language and work seamlessly together.
+## Features
 
-![Grow Room Cards](https://img.shields.io/badge/Cards-5-green) ![Status](https://img.shields.io/badge/Status-Stable-success)
+- 🌸 **Room Overview Dashboard** - Complete at-a-glance view with sparkline graphs
+- 🌡️ **Environment Monitoring** - Real-time temp, humidity, VPD, CO2 tracking
+- 📊 **VPD Chart** - Interactive vapor pressure deficit analysis
+- 📋 **Grow Report** - Athena Pro Line feeding schedule integration
+- 📸 **Camera Support** - RTSP cameras with scheduled snapshots
+- 🧪 **Nutrient Management** - EC/pH monitoring and dosing control
+- 🔔 **Alert System** - Centralized alert management with sound notifications
+- 📅 **Grow Calendar** - Multi-room timeline and event tracking
+- 📝 **Grow Journal** - Daily notes and observations
+- 💧 **Irrigation Control** - Zone management with VWC/EC monitoring
+- 🔌 **Switch Control** - Organized equipment control with tabs
+- 🌈 **Spectrum Analysis** - AS7341 sensor visualization
 
-## 🌱 Cards Included (12 Total)
-
-| Card | Type | Purpose |
-|------|------|---------|
-| 🌸 **Room Overview** | `grow-room-overview-card` | Complete room dashboard with metrics & alerts |
-| 🌡️ **Environment Monitor** | `grow-environment-card` | Monitor temp, humidity, CO2, VPD with history |
-| 📊 **VPD Chart** | `grow-vpd-chart-card` | Interactive VPD analysis with color zones |
-| 📋 **Grow Report** | `grow-report-card` | Daily/weekly report with Athena Pro Line schedule |
-| 📸 **Camera/Timelapse** | `grow-camera-card` | Camera monitoring with timelapse and snapshots |
-| 🧪 **Nutrient Dosing** | `grow-nutrient-card` | EC/pH control with automated dosing |
-| 🔔 **Alert Manager** | `grow-alert-card` | Centralized alert management for all rooms |
-| 📅 **Grow Calendar** | `grow-calendar-card` | Visual timeline and multi-room planning |
-| 📝 **Grow Journal** | `grow-journal-card` | Daily notes and observations with tagging |
-| 🌈 **Spectrum Sensor** | `grow-spectrum-card` | AS7341 spectral visualization |
-| 💧 **Irrigation Control** | `grow-irrigation-card` | Manage zones with VWC and EC monitoring |
-| 🔌 **Switch Control** | `grow-switch-card` | Control lights, fans, and equipment |
-
-## 📦 Installation
+## Installation
 
 ### HACS (Recommended)
 
 1. Open **HACS** in Home Assistant
 2. Go to **Frontend**
-3. Click the **⋮** menu and select **Custom repositories**
-4. Add repository: `https://github.com/goatboynz/ha-grow-room-cards`
+3. Click **⋮** menu → **Custom repositories**
+4. Add: `https://github.com/goatboynz/ha-grow-room-cards`
 5. Category: **Lovelace**
 6. Click **Install**
 7. **Restart** Home Assistant
+8. **Hard refresh** browser (Ctrl+Shift+R)
 
 ### Manual Installation
 
 1. Download the [latest release](https://github.com/goatboynz/ha-grow-room-cards/releases)
-2. Copy all `.js` files to `config/www/grow-room-cards/`
-3. Add resource in Home Assistant:
-   - Go to **Settings** → **Dashboards** → **Resources**
-   - Click **Add Resource**
-   - URL: `/local/grow-room-cards/grow-room-cards.js`
-   - Resource type: **JavaScript Module**
+2. Copy all `.js` files to `/config/www/grow-room-cards/`
+3. Add resources in **Settings** → **Dashboards** → **Resources**:
+   - URL: `/local/grow-room-cards/grow-room-cards.js?v=1.0`
+   - Type: **JavaScript Module**
 4. **Restart** Home Assistant
-5. **Clear browser cache** (Ctrl+Shift+R)
+5. **Hard refresh** browser (Ctrl+Shift+R)
 
-## 🚀 Quick Start
+## Quick Start
 
-### 1. Environment Monitor Card
+### 1. Create Required Input Helpers
 
-Monitor your grow room's key environmental parameters with clickable history graphs.
+Add to `configuration.yaml`:
 
 ```yaml
-type: custom:grow-environment-card
-entities:
-  temperature: sensor.grow_room_temperature
-  humidity: sensor.grow_room_humidity
-  co2: sensor.grow_room_co2
-  vpd: sensor.grow_room_vpd
-title: Grow Room Environment
-history_hours: 24
+input_datetime:
+  flower_start_date:
+    name: Flower Start Date
+    has_date: true
+    has_time: false
+
+input_select:
+  grow_stage:
+    name: Grow Stage
+    options:
+      - Seedling
+      - Vegetative  
+      - Flowering
+      - Harvest
+    initial: Flowering
 ```
 
-**Features:**
-- Click any metric to view 24-hour history
-- Color-coded cards (red=temp, blue=humidity, green=CO2, yellow=VPD)
-- Real-time updates
+### 2. Add Your First Card
 
----
-
-### 2. VPD Chart Card
-
-Interactive Vapor Pressure Deficit chart with color-coded zones for optimal plant growth.
+Edit your dashboard and add:
 
 ```yaml
-type: custom:grow-vpd-chart-card
-temperature_sensor: sensor.grow_room_temperature
-humidity_sensor: sensor.grow_room_humidity
-leaf_temperature_offset: 2
-title: VPD Analysis
-min_temperature: 15
-max_temperature: 35
-min_humidity: 30
-max_humidity: 90
-enable_crosshair: true
-enable_zoom: true
+type: custom:grow-room-overview-card
+title: Main Tent
+room_name: Main Tent
+start_date_entity: input_datetime.flower_start_date
+lights_entity: light.grow_lights
+temperature_entity: sensor.grow_room_temperature
+humidity_entity: sensor.grow_room_humidity
+vpd_entity: sensor.grow_room_vpd
+co2_entity: sensor.grow_room_co2
+show_sparklines: true
 ```
 
-**Features:**
-- Interactive crosshair follows mouse
-- Zoom with mouse wheel
-- Pan when zoomed (click and drag)
-- Displays both Leaf VPD and Room VPD
-- Color-coded zones (blue=too low, green=optimal, yellow=flowering, red=too high)
+## Card Configurations
 
-**Optional Configuration:**
-```yaml
-leaf_temperature_sensor: sensor.leaf_temperature  # Use actual leaf temp sensor
-growth_stage: vegetative  # Options: seedling, vegetative, flowering, late_flower
-```
+### Room Overview Card
 
----
-
-### 3. Grow Report Card
-
-Comprehensive daily/weekly grow report based on Athena Pro Line feeding schedule.
+Complete dashboard with metrics, day counter, and alerts.
 
 ```yaml
-type: custom:grow-report-card
-room_name: Flower Room 1
-start_date_entity: input_datetime.f1_start_date
-temperature_entity: sensor.f1_temperature
-humidity_entity: sensor.f1_humidity
-vpd_entity: sensor.f1_vpd
-co2_entity: sensor.f1_co2
-lights_entity: switch.f1_lights
+type: custom:grow-room-overview-card
+title: F2 Flowering Room
+room_name: F2 Flowering Room
+start_date_entity: input_datetime.f2_flower_start
+stage_entity: input_select.f2_grow_stage
+lights_entity: switch.f2_light
+temperature_entity: sensor.f2_temperature
+humidity_entity: sensor.f2_humidity
+vpd_entity: sensor.f2_vpd
+leaf_vpd_entity: sensor.f2_leaf_vpd
+co2_entity: sensor.f2_co2
+last_watering_entity: sensor.f2_last_watering
+alert_entities:
+  - binary_sensor.f2_high_temp
+  - binary_sensor.f2_low_humidity
+show_sparklines: true
 light_hours: 12
 ```
 
-**Features:**
-- Automatic week/day calculation from start date
-- Week-by-week Athena Pro Line targets
-- Event scheduling (deleaf, lollipop, harvest)
-- Smart alerts for out-of-range parameters
-- Daily grower checklist
-- Troubleshooting tips from Athena Handbook
+### Environment Monitor Card
 
-**Required Setup:**
+Real-time monitoring with clickable history graphs.
+
 ```yaml
-# configuration.yaml
-input_datetime:
-  f1_start_date:
-    name: Flower Room 1 Start Date
-    has_date: true
-    has_time: false
+type: custom:grow-environment-card
+title: Environment Monitor
+entities:
+  temperature: sensor.grow_room_temperature
+  humidity: sensor.grow_room_humidity
+  vpd: sensor.grow_room_vpd
+  co2: sensor.grow_room_co2
 ```
 
-See [REPORT-CARD-SETUP.md](REPORT-CARD-SETUP.md) for complete setup guide.
+### VPD Chart Card
 
----
+Interactive VPD analysis with color-coded zones.
 
-### 4. Camera/Timelapse Card
+```yaml
+type: custom:grow-vpd-chart-card
+title: VPD Analysis
+temperature_entity: sensor.grow_room_temperature
+humidity_entity: sensor.grow_room_humidity
+vpd_entity: sensor.grow_room_vpd
+leaf_offset: 2
+```
 
-Camera monitoring with RTSP support, scheduled snapshots, and timelapse creation.
+### Grow Report Card
+
+Daily/weekly reports with Athena Pro Line schedule.
+
+```yaml
+type: custom:grow-report-card
+title: Grow Report
+room_name: Main Tent
+start_date_entity: input_datetime.flower_start_date
+temperature_entity: sensor.grow_room_temperature
+humidity_entity: sensor.grow_room_humidity
+vpd_entity: sensor.grow_room_vpd
+co2_entity: sensor.grow_room_co2
+lights_entity: light.grow_lights
+zone_1_entity: switch.irrigation_zone_1
+zone_2_entity: switch.irrigation_zone_2
+light_hours: 12
+feed_system: athena_pro
+grow_medium: coco
+```
+
+### Camera Card
+
+RTSP camera support with scheduled snapshots.
 
 **Standard Camera:**
 ```yaml
 type: custom:grow-camera-card
+title: Grow Camera
 camera_entity: camera.grow_room
-snapshot_times: ['06:00', '12:00', '18:00', '00:00']
+snapshot_times:
+  - "06:00"
+  - "12:00"
+  - "18:00"
+  - "00:00"
 snapshot_storage: /config/www/snapshots/
 ```
 
 **RTSP Camera:**
 ```yaml
 type: custom:grow-camera-card
-rtsp_url: rtsp://192.168.1.100:554/stream
+title: Grow Camera
+rtsp_url: "rtsp://192.168.1.100:554/stream"
 rtsp_username: admin
 rtsp_password: password
-rtsp_snapshot_url: http://192.168.1.100/snapshot.jpg
-snapshot_times: ['06:00', '12:00', '18:00', '00:00']
+rtsp_snapshot_url: "http://192.168.1.100/snapshot.jpg"
+snapshot_times:
+  - "06:00"
+  - "12:00"
+  - "18:00"
+  - "00:00"
 snapshot_storage: /config/www/snapshots/
 ```
 
-**Features:**
-- Live camera feed (standard or RTSP)
-- Scheduled automatic snapshots
-- Manual snapshot capture
-- Timelapse creation from snapshots
-- Snapshot gallery
-- Before/after comparison
-
----
-
-### 5. Nutrient Dosing Card
-
-EC/pH control with automated dosing pumps.
-
+**Required for RTSP (add to configuration.yaml):**
 ```yaml
-type: custom:grow-nutrient-card
-reservoir_ec: sensor.reservoir_ec
-reservoir_ph: sensor.reservoir_ph
-reservoir_level: sensor.reservoir_level
-reservoir_temp: sensor.reservoir_temp
-target_ec: 2.0
-target_ph: 5.8
-reservoir_volume: 100
-dosing_pumps:
-  - entity: switch.pump_part_a
-    name: Part A
-    ml_per_second: 10
-  - entity: switch.pump_part_b
-    name: Part B
-    ml_per_second: 10
+shell_command:
+  capture_rtsp_snapshot: >
+    ffmpeg -rtsp_transport tcp 
+    -i {{ rtsp_url }} 
+    -frames:v 1 
+    {{ filename }}
 ```
 
-**Features:**
-- Real-time EC/pH/Level/Temp display
-- Automated dosing pump control
-- Dosing calculator
-- Target range alerts
-- Manual and auto-dose modes
+### Switch Control Card
 
----
+Equipment control with optional category tabs.
 
-### 6. Alert Manager Card
-
-Centralized alert management for all grow rooms.
-
-```yaml
-type: custom:grow-alert-card
-rooms:
-  - Flower Room 1
-  - Flower Room 2
-  - Veg Room
-alert_entities:
-  - binary_sensor.f1_high_temp
-  - binary_sensor.f1_low_humidity
-  - binary_sensor.f1_light_leak
-show_history: true
-notification_service: notify.mobile_app
-```
-
-**Features:**
-- Centralized alerts from all rooms
-- Critical/Warning/Info severity levels
-- Snooze and acknowledge alerts
-- Alert history tracking
-- Room filtering
-- Auto-detection of alert entities
-
----
-
-### 11. Switch Control Card
-
-Stylish control panel for all your grow room equipment with optional category tabs.
-
-**Basic Configuration:**
+**Simple:**
 ```yaml
 type: custom:grow-switch-card
 title: Equipment Control
@@ -251,12 +217,9 @@ switches:
   - entity: switch.exhaust_fan
     name: Exhaust Fan
     icon: "mdi:fan"
-  - entity: switch.circulation_fan
-    name: Circulation Fan
-    icon: "mdi:fan"
 ```
 
-**With Categories/Tabs:**
+**With Tabs:**
 ```yaml
 type: custom:grow-switch-card
 title: Equipment Control
@@ -286,297 +249,292 @@ tabs:
         icon: "mdi:water-pump"
 ```
 
-**Features:**
-- Visual on/off status with color coding
-- Tap to toggle switches
-- Custom icons for each switch
-- Optional category tabs for organization
-- Responsive grid layout
-- `dehumidifier` 🌬️ - Dehumidifiers
-- `heater` 🔥 - Heaters
-- `cooler` ❄️ - Coolers
-- `pump` ⚡ - Pumps
-- `valve` 🚰 - Valves
+### Alert Manager Card
 
-**Features:**
-- One-click toggle
-- Visual ON/OFF states
-- Custom icons per device type
-- Hover effects
+Centralized alert management with sound notifications.
 
----
+```yaml
+type: custom:grow-alert-card
+title: Alert Manager
+rooms:
+  - Main Tent
+  - Veg Room
+enable_sound: true
+show_history: true
+alert_entities:
+  - binary_sensor.high_temp_alert
+  - binary_sensor.low_humidity_alert
+notification_service: notify.mobile_app
+```
 
-### 10. Irrigation Control Card
+### Nutrient Dosing Card
 
-Manage watering zones with soil moisture (VWC) and nutrient (EC) monitoring.
+EC/pH control with automated dosing.
+
+```yaml
+type: custom:grow-nutrient-card
+title: Nutrient Management
+ec_sensor: sensor.reservoir_ec
+ph_sensor: sensor.reservoir_ph
+target_ec: 2.0
+target_ph: 5.8
+ec_up_pump: switch.ec_up_pump
+ec_down_pump: switch.ec_down_pump
+ph_up_pump: switch.ph_up_pump
+ph_down_pump: switch.ph_down_pump
+reservoir_level: sensor.reservoir_level
+```
+
+### Irrigation Control Card
+
+Zone management with VWC and EC monitoring.
 
 ```yaml
 type: custom:grow-irrigation-card
-title: Irrigation System
-history_hours: 24
+title: Irrigation Control
 zones:
-  - entity: switch.irrigation_zone_1
-    name: Main Bed
+  - name: Zone 1
+    switch: switch.irrigation_zone_1
     vwc_sensor: sensor.zone_1_vwc
     ec_sensor: sensor.zone_1_ec
-  - entity: switch.irrigation_zone_2
-    name: Side Bed
+  - name: Zone 2
+    switch: switch.irrigation_zone_2
     vwc_sensor: sensor.zone_2_vwc
     ec_sensor: sensor.zone_2_ec
-  - entity: switch.irrigation_zone_3
-    name: Seedling Tray
-    vwc_sensor: sensor.zone_3_vwc
+schedule_entity: input_boolean.irrigation_schedule
 ```
 
-**Features:**
-- Multiple zone support
-- Start/Stop controls per zone
-- Real-time VWC (Volumetric Water Content) display
-- Real-time EC (Electrical Conductivity) display
-- Click graph buttons to view 24-hour trends
-- Active zones highlighted in green
+### Grow Calendar Card
 
-**Sensor Units:**
-- VWC: % (percentage)
-- EC: mS/cm (milliSiemens per centimeter)
-
----
-
-### 7. Grow Calendar Card
-
-Visual timeline and scheduling for multiple grow rooms.
+Multi-room timeline and event tracking.
 
 ```yaml
 type: custom:grow-calendar-card
+title: Grow Calendar
 rooms:
-  - name: Flower Room 1
-    start_date_entity: input_datetime.f1_start_date
-  - name: Flower Room 2
-    start_date_entity: input_datetime.f2_start_date
-show_events: true
-show_tasks: true
+  - name: Main Tent
+    start_date_entity: input_datetime.main_tent_start
+    color: "#4CAF50"
+  - name: Veg Room
+    start_date_entity: input_datetime.veg_room_start
+    color: "#2196F3"
+events:
+  - name: Defoliation
+    day: 21
+    icon: "mdi:leaf"
+  - name: Harvest Window
+    day: 56
+    icon: "mdi:cannabis"
 ```
 
-**Features:**
-- Month, Timeline, and Tasks views
-- Automatic event scheduling (deleaf, lollipop, harvest)
-- Multi-room support
-- Color-coded events
-- Upcoming tasks with countdown
+### Grow Journal Card
 
-**Required Setup:**
-```yaml
-# configuration.yaml
-input_datetime:
-  f1_start_date:
-    name: Flower Room 1 Start Date
-    has_date: true
-    has_time: false
-  f2_start_date:
-    name: Flower Room 2 Start Date
-    has_date: true
-    has_time: false
-```
-
----
-
-### 8. Grow Journal Card
-
-Daily notes and observations with tagging and filtering.
+Daily notes and observations.
 
 ```yaml
 type: custom:grow-journal-card
-room_name: Flower Room 1
-storage_entity: input_text.f1_journal
-max_entries: 100
+title: Grow Journal
+room_name: Main Tent
+storage_entity: input_text.grow_journal_storage
+enable_photos: true
 tags:
-  - General
-  - Watering
   - Feeding
+  - Defoliation
   - Training
-  - Deficiency
-  - Pest
   - Observation
+  - Problem
 ```
 
-**Features:**
-- Quick note entry with tags
-- Filter by tag
-- Entry statistics
-- Delete entries
-- Persistent storage in Home Assistant
+### Spectrum Sensor Card
 
-**Required Setup:**
-```yaml
-# configuration.yaml
-input_text:
-  f1_journal:
-    name: Flower Room 1 Journal
-    max: 255
-    initial: "[]"
-```
-
-**Note**: For longer journal entries, you may need to increase the `max` value or use multiple input_text entities.
-
----
-
-### 9. Spectrum Sensor Card
-
-Visualize light spectrum from AS7341 spectral sensor.
+AS7341 spectral visualization.
 
 ```yaml
 type: custom:grow-spectrum-card
-entity: sensor.as7341_spectrum
-title: Light Spectrum Analysis
-show_wavelengths: true
+title: Light Spectrum
+sensor_prefix: sensor.as7341
+channels:
+  - 415nm
+  - 445nm
+  - 480nm
+  - 515nm
+  - 555nm
+  - 590nm
+  - 630nm
+  - 680nm
+show_par: true
+show_ratios: true
 ```
 
-**Features:**
-- 10-channel spectral display (415nm to NIR)
-- Rainbow gradient visualization
-- Smooth interpolation
-- Hover tooltips with wavelength info
+## Troubleshooting
 
-**Channels:**
-- 415nm (Violet), 445nm (Blue), 480nm (Cyan)
-- 515nm (Green), 555nm (Yellow-Green), 590nm (Yellow)
-- 630nm (Orange), 680nm (Red)
-- Clear (full spectrum), NIR (Near Infrared)
+### Cards Not Appearing
 
----
+1. **Clear browser cache:** Ctrl+Shift+R (Windows/Linux) or Cmd+Shift+R (Mac)
+2. **Restart Home Assistant:** Developer Tools → YAML → Restart
+3. **Check resources:** Settings → Dashboards → Resources
+4. **Add version to URL:** `/local/grow-room-cards/grow-room-cards.js?v=1.0`
 
-## 📖 Complete Dashboard Example
+### Configuration Errors
+
+**"Please define camera_entity"**
+- Using RTSP? Use `rtsp_url` instead of `camera_entity`
+- Clear browser cache completely
+
+**"Please define at least one switch"**
+- Check YAML indentation (use 2 spaces, not tabs)
+- Ensure switches array is not empty
+- Verify entity IDs exist in Developer Tools → States
+
+**"Custom element doesn't exist"**
+- Resource not loaded - check URL in Resources
+- Clear browser cache and hard refresh
+- Restart Home Assistant
+
+### YAML Indentation
+
+Each level must be indented by exactly 2 spaces:
 
 ```yaml
-title: Grow Room
+type: custom:grow-switch-card
+title: Equipment
+tabs:
+  - name: Lighting
+    switches:
+      - entity: light.grow_lights
+        name: Main Lights
+```
+
+### Entity Verification
+
+Check entities exist:
+1. Go to **Developer Tools** → **States**
+2. Search for your entity
+3. Copy exact entity ID
+
+## Example Dashboard
+
+```yaml
 views:
-  - title: Main
-    path: main
+  - title: Grow Room
     cards:
-      # Environment monitoring
-      - type: custom:grow-environment-card
-        entities:
-          temperature: sensor.grow_room_temperature
-          humidity: sensor.grow_room_humidity
-          co2: sensor.grow_room_co2
-          vpd: sensor.grow_room_vpd
-        title: Environment
-        
-      # VPD Chart
-      - type: custom:grow-vpd-chart-card
-        temperature_sensor: sensor.grow_room_temperature
-        humidity_sensor: sensor.grow_room_humidity
-        leaf_temperature_offset: 2
-        title: VPD Analysis
-        
-      # Equipment control
+      # Room Overview
+      - type: custom:grow-room-overview-card
+        room_name: Main Tent
+        start_date_entity: input_datetime.flower_start
+        lights_entity: light.grow_lights
+        temperature_entity: sensor.temperature
+        humidity_entity: sensor.humidity
+        vpd_entity: sensor.vpd
+        co2_entity: sensor.co2
+      
+      # Environment Details
+      - type: horizontal-stack
+        cards:
+          - type: custom:grow-environment-card
+            entities:
+              temperature: sensor.temperature
+              humidity: sensor.humidity
+              vpd: sensor.vpd
+              co2: sensor.co2
+          
+          - type: custom:grow-vpd-chart-card
+            temperature_entity: sensor.temperature
+            humidity_entity: sensor.humidity
+            vpd_entity: sensor.vpd
+      
+      # Controls
       - type: horizontal-stack
         cards:
           - type: custom:grow-switch-card
             title: Equipment
-            switches:
-              - entity: switch.grow_light
-                name: Main Light
-                type: light
-              - entity: switch.exhaust_fan
-                name: Exhaust
-                type: fan
-              - entity: switch.humidifier
-                type: humidifier
-              - entity: switch.dehumidifier
-                type: dehumidifier
-                
-          # Irrigation
+            tabs:
+              - name: Lighting
+                switches:
+                  - entity: light.grow_lights
+                    name: Main Lights
+                    icon: "mdi:lightbulb"
+              - name: Climate
+                switches:
+                  - entity: switch.exhaust_fan
+                    name: Exhaust
+                    icon: "mdi:fan"
+          
           - type: custom:grow-irrigation-card
-            title: Watering
             zones:
-              - entity: switch.irrigation_zone_1
-                name: Main Bed
-                vwc_sensor: sensor.zone_1_vwc
-                ec_sensor: sensor.zone_1_ec
-                
-      # Light spectrum
-      - type: custom:grow-spectrum-card
-        entity: sensor.as7341_spectrum
-        title: Light Spectrum
+              - name: Zone 1
+                switch: switch.zone_1
+      
+      # Monitoring
+      - type: custom:grow-camera-card
+        camera_entity: camera.grow_room
+      
+      # Management
+      - type: horizontal-stack
+        cards:
+          - type: custom:grow-report-card
+            room_name: Main Tent
+            start_date_entity: input_datetime.flower_start
+            temperature_entity: sensor.temperature
+            humidity_entity: sensor.humidity
+            vpd_entity: sensor.vpd
+            co2_entity: sensor.co2
+            lights_entity: light.grow_lights
+          
+          - type: custom:grow-alert-card
+            rooms:
+              - Main Tent
 ```
 
-## 🎨 Features
+## Recommended Sensors
 
-### Unified Design
-- Consistent styling across all cards
-- Smooth animations and transitions
-- Responsive layout (mobile-friendly)
-- Dark/light mode support
-- Uses Home Assistant theme colors
+| Metric | Sensor | Notes |
+|--------|--------|-------|
+| Temperature | SHT31, BME280, DHT22 | ±0.3°C accuracy |
+| Humidity | SHT31, BME280 | ±2% RH accuracy |
+| CO2 | SCD30, SCD40, MH-Z19 | NDIR sensors preferred |
+| Light | AS7341, TSL2591 | Spectral sensors for PAR |
+| EC/pH | Atlas Scientific | Requires calibration |
 
-### Interactive Elements
-- Clickable metrics for history graphs
-- Hover tooltips with detailed info
-- Zoom and pan on VPD chart
-- Visual feedback on all controls
-- Real-time updates
+## Support
 
-### Performance
-- Lightweight (~50KB total)
-- Canvas-based charts for smooth rendering
-- Efficient API calls
-- Cached history data
-- Fast load times
+- **Issues:** [GitHub Issues](https://github.com/goatboynz/ha-grow-room-cards/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/goatboynz/ha-grow-room-cards/discussions)
+- **Home Assistant Community:** [Forum Thread](https://community.home-assistant.io/)
 
-## 📚 Documentation
+## Contributing
 
-- **[Wiki Home](../../wiki)** - Complete documentation
-- **[Installation Guide](../../wiki/Installation)** - Detailed setup instructions
-- **[Card Configuration](../../wiki/Card-Configuration)** - All configuration options
-- **[Troubleshooting](../../wiki/Troubleshooting)** - Common issues and solutions
-- **[Examples](../../wiki/Examples)** - Real-world configurations
+Contributions are welcome! Please:
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
-## 🐛 Troubleshooting
-
-### Cards not showing
-1. Clear browser cache (Ctrl+Shift+R or Cmd+Shift+R)
-2. Check browser console (F12) for errors
-3. Verify resource is added in Settings → Dashboards → Resources
-
-### "Custom element doesn't exist"
-- Resource wasn't loaded properly
-- Clear cache and hard refresh
-- Check resource URL is correct: `/local/grow-room-cards/grow-room-cards.js`
-
-### Entities showing as "unavailable"
-- Verify entity IDs are correct
-- Check entities exist in Developer Tools → States
-- Ensure sensors are working and reporting data
-
-### History graphs not loading
-- Ensure recorder is enabled in Home Assistant
-- Check entities have history in Developer Tools → History
-- Verify API access is working
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📝 License
+## License
 
 MIT License - see [LICENSE](LICENSE) file for details
 
-## ⭐ Support
+## Credits
 
-If you find these cards useful, please consider:
-- ⭐ Starring this repository
-- 🐛 Reporting issues
-- 💡 Suggesting new features
-- 📖 Improving documentation
+Created for the Home Assistant grow room automation community.
 
-## 🔗 Links
+Special thanks to:
+- Athena Pro Line for feeding schedules
+- Home Assistant community
+- All contributors and testers
 
-- [GitHub Repository](https://github.com/goatboynz/ha-grow-room-cards)
-- [Issues](https://github.com/goatboynz/ha-grow-room-cards/issues)
-- [Discussions](https://github.com/goatboynz/ha-grow-room-cards/discussions)
-- [Wiki](../../wiki)
+## Changelog
+
+### v1.0 (2025-11-11)
+- Initial release
+- 12 custom cards for grow room automation
+- RTSP camera support
+- Athena Pro Line integration
+- Multi-room support
+- Sound notifications
+- Sparkline graphs
+- Tab-based organization
 
 ---
 
-Made with 🌱 for the Home Assistant community
+**Made with 🌱 for the grow community**
