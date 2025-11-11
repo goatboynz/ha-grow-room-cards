@@ -278,11 +278,13 @@ class GrowCameraCard extends HTMLElement {
   }
 
   setupEventListeners() {
-    // Render timelapse schedule
+    // Render snapshot schedule
     const scheduleEl = this.shadowRoot.getElementById('timelapse-schedule');
-    scheduleEl.innerHTML = this.config.timelapse_times.map(time => 
-      `<span class="time-badge">${time}</span>`
-    ).join('');
+    if (scheduleEl && this.config.snapshot_times) {
+      scheduleEl.innerHTML = this.config.snapshot_times.map(time => 
+        `<span class="time-badge">${time}</span>`
+      ).join('');
+    }
   }
 
   scheduleSnapshotCaptures() {
@@ -410,8 +412,8 @@ class GrowCameraCard extends HTMLElement {
     return {
       camera_entity: 'camera.grow_room',
       refresh_interval: 5000,
-      timelapse_times: ['06:00', '12:00', '18:00', '00:00'],
-      timelapse_storage: '/config/www/timelapse/'
+      snapshot_times: ['06:00', '12:00', '18:00', '00:00'],
+      snapshot_storage: '/config/www/snapshots/'
     };
   }
 }

@@ -1,7 +1,12 @@
+/**
+ * Grow Room Overview Card v1.0
+ * Complete room dashboard with metrics, sparklines, and alerts
+ */
 class GrowRoomOverviewCard extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+    console.log('Grow Room Overview Card v1.0 initialized');
   }
 
   setConfig(config) {

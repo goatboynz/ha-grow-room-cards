@@ -566,9 +566,15 @@ class VPDChartCard extends HTMLElement {
   }
 }
 
-customElements.define('vpd-chart-card', VPDChartCard);
+customElements.define('grow-vpd-chart-card', VPDChartCard);
 
 window.customCards = window.customCards || [];
+window.customCards.push({
+  type: 'grow-vpd-chart-card',
+  name: 'Grow VPD Chart Card',
+  description: 'Interactive VPD chart with color-coded zones',
+  preview: true
+});
 window.customCards.push({
   type: 'vpd-chart-card',
   name: 'VPD Chart Card',
