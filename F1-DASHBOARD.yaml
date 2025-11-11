@@ -42,10 +42,9 @@ views:
           
           - type: custom:grow-vpd-chart-card
             title: F1 VPD Analysis
-            temperature_entity: sensor.f1_room_stats_f1_room_stats_canopy_temperature
-            humidity_entity: sensor.f1_room_stats_f1_room_stats_average_humidity
-            vpd_entity: sensor.f1_room_stats_f1_room_stats_room_vpd
-            leaf_offset: 2
+            temperature_sensor: sensor.f1_room_stats_f1_room_stats_canopy_temperature
+            humidity_sensor: sensor.f1_room_stats_f1_room_stats_average_humidity
+            leaf_temperature_offset: 2
       
       # ============================================
       # CAMERA SECTION

@@ -8,15 +8,17 @@ console.info(
 );
 
 // Import all cards
+import './grow-room-overview-card.js';
 import './grow-environment-card.js';
-import './grow-switch-card.js';
-import './grow-irrigation-card.js';
 import './grow-vpd-chart-card.js';
-import './grow-spectrum-card.js';
 import './grow-report-card.js';
 import './grow-camera-card.js';
+import './grow-switch-card.js';
+import './grow-sensor-monitor-card.js';
+import './grow-irrigation-card.js';
 import './grow-nutrient-card.js';
 import './grow-alert-card.js';
 import './grow-calendar-card.js';
 import './grow-journal-card.js';
+import './grow-spectrum-card.js';
 import './grow-settings-card.js';
