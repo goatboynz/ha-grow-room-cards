@@ -345,6 +345,67 @@ tags:
   - Problem
 ```
 
+### Sensor Monitor Card
+
+Multiple sensors organized in tabs with click-to-view history.
+
+```yaml
+type: custom:grow-sensor-monitor-card
+title: Sensor Monitor
+tabs:
+  - name: Temperature
+    sensors:
+      - entity: sensor.temp_1
+        name: Temp Sensor 1
+        icon: 🌡️
+      - entity: sensor.temp_2
+        name: Temp Sensor 2
+        icon: 🌡️
+  - name: Humidity
+    sensors:
+      - entity: sensor.humidity_1
+        name: Humidity 1
+        icon: 💧
+      - entity: sensor.humidity_2
+        name: Humidity 2
+        icon: 💧
+```
+
+### Chart Dashboard Card
+
+ApexCharts in organized tabs for advanced analytics.
+
+```yaml
+type: custom:grow-chart-card
+title: Analytics Dashboard
+tabs:
+  - name: VWC & EC
+    title: Soil Monitoring
+    description: Volumetric Water Content and Electrical Conductivity
+    chart:
+      graph_span: 24h
+      yaxis:
+        - id: vwc
+        - id: ec
+          opposite: true
+      series:
+        - entity: sensor.vwc_1
+          name: VWC 1
+          yaxis_id: vwc
+          color: '#3498db'
+        - entity: sensor.ec_1
+          name: EC 1
+          yaxis_id: ec
+          color: '#f1c40f'
+  - name: Temperature
+    title: Temperature Trends
+    chart:
+      graph_span: 24h
+      series:
+        - entity: sensor.temp_1
+          name: Temp 1
+```
+
 ### Spectrum Sensor Card
 
 AS7341 spectral visualization.

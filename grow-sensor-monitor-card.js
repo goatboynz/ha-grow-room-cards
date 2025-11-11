@@ -40,8 +40,9 @@ class GrowSensorMonitorCard extends HTMLElement {
           font-size: 20px;
           font-weight: 600;
           padding: 16px;
-          background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           color: white;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .tabs {
           display: flex;
@@ -155,6 +156,26 @@ class GrowSensorMonitorCard extends HTMLElement {
 
     const sensors = currentTabConfig.sensors.map(sensor => this.createSensor(sensor)).join('');
     grid.innerHTML = sensors;
+    
+    // Add click handlers to show history
+    grid.querySelectorAll('.sensor-card').forEach(card => {
+      const entityId = card.dataset.entity;
+      if (entityId && !card.classList.contains('unavailable')) {
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', () => {
+          this.showEntityHistory(entityId);
+        });
+      }
+    });
+  }
+
+  showEntityHistory(entityId) {
+    const event = new Event('hass-more-info', {
+      bubbles: true,
+      composed: true
+    });
+    event.detail = { entityId };
+    this.dispatchEvent(event);
   }
 
   createSensor(sensor) {
@@ -174,12 +195,18 @@ class GrowSensorMonitorCard extends HTMLElement {
     const unit = entity.attributes.unit_of_measurement || '';
     const isUnavailable = state === 'unavailable' || state === 'unknown';
     
+    // Format number to 1 decimal place
+    let displayValue = state;
+    if (!isUnavailable && !isNaN(parseFloat(state))) {
+      displayValue = parseFloat(state).toFixed(1);
+    }
+    
     return `
-      <div class="sensor-card ${isUnavailable ? 'unavailable' : ''}">
+      <div class="sensor-card ${isUnavailable ? 'unavailable' : ''}" data-entity="${sensor.entity}">
         <div class="sensor-icon">${sensor.icon || '📊'}</div>
         <div class="sensor-name">${sensor.name}</div>
         <div class="sensor-value">
-          ${isUnavailable ? 'N/A' : state}
+          ${isUnavailable ? 'N/A' : displayValue}
           ${!isUnavailable && unit ? `<span class="sensor-unit">${unit}</span>` : ''}
         </div>
         <div class="sensor-state">${entity.attributes.friendly_name || ''}</div>

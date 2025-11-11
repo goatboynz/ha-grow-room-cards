@@ -231,22 +231,42 @@ class GrowIrrigationCard extends HTMLElement {
   }
 
   createZone(zone) {
-    const entity = this._hass.states[zone.entity];
-    if (!entity) return '';
+    // Support both 'entity' and 'switch' property names
+    const entityId = zone.switch || zone.entity;
+    const entity = this._hass.states[entityId];
+    
+    if (!entity) {
+      return `
+        <div class="zone unavailable">
+          <div class="zone-header">
+            <div class="zone-name">${zone.name || 'Unknown Zone'}</div>
+            <div style="color: var(--secondary-text-color);">Unavailable</div>
+          </div>
+        </div>
+      `;
+    }
 
     const isActive = entity.state === 'on';
+    const lastChanged = new Date(entity.last_changed);
+    const now = new Date();
+    const hoursAgo = Math.floor((now - lastChanged) / (1000 * 60 * 60));
+    const minutesAgo = Math.floor((now - lastChanged) / (1000 * 60));
+    const timeAgo = hoursAgo > 0 ? `${hoursAgo}h ago` : `${minutesAgo}m ago`;
     
     // Get sensor values
     const vwc = zone.vwc_sensor ? this._hass.states[zone.vwc_sensor] : null;
     const ec = zone.ec_sensor ? this._hass.states[zone.ec_sensor] : null;
 
     return `
-      <div class="zone ${isActive ? 'active' : ''}" data-zone="${zone.entity}">
+      <div class="zone ${isActive ? 'active' : ''}" data-zone="${entityId}">
         <div class="zone-header">
           <div class="zone-name">${zone.name || entity.attributes.friendly_name}</div>
-          <button class="zone-toggle ${isActive ? 'active' : ''}" data-entity="${zone.entity}">
+          <button class="zone-toggle ${isActive ? 'active' : ''}" data-entity="${entityId}">
             ${isActive ? '⏸ Stop' : '▶ Start'}
           </button>
+        </div>
+        <div style="font-size: 12px; color: var(--secondary-text-color); margin-bottom: 8px;">
+          Last active: ${timeAgo}
         </div>
         ${vwc || ec ? `
           <div class="zone-metrics">
@@ -268,8 +288,8 @@ class GrowIrrigationCard extends HTMLElement {
             ` : ''}
           </div>
           <div class="graph-buttons">
-            ${vwc ? `<button class="graph-button" data-zone="${zone.entity}" data-type="vwc">📊 VWC History</button>` : ''}
-            ${ec ? `<button class="graph-button" data-zone="${zone.entity}" data-type="ec">📊 EC History</button>` : ''}
+            ${vwc ? `<button class="graph-button" data-zone="${entityId}" data-type="vwc">📊 VWC History</button>` : ''}
+            ${ec ? `<button class="graph-button" data-zone="${entityId}" data-type="ec">📊 EC History</button>` : ''}
           </div>
         ` : ''}
       </div>
