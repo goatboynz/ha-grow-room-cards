@@ -561,9 +561,15 @@ class AS7341SpectrumCard extends HTMLElement {
   }
 }
 
-customElements.define('as7341-spectrum-card', AS7341SpectrumCard);
+customElements.define('grow-spectrum-card', AS7341SpectrumCard);
 
 window.customCards = window.customCards || [];
+window.customCards.push({
+  type: 'grow-spectrum-card',
+  name: 'Grow Spectrum Card',
+  description: 'AS7341 spectral sensor visualization with PAR analysis',
+  preview: true
+});
 window.customCards.push({
   type: 'as7341-spectrum-card',
   name: 'AS7341 Spectrum Card',
