@@ -1,0 +1,354 @@
+# F1 Flowering Room Dashboard
+# Using Grow Room Cards v1.0
+
+views:
+  - type: sections
+    title: F1 Flowering Room
+    path: f1
+    icon: mdi:flower-outline
+    
+    # Header Card
+    header:
+      card:
+        type: markdown
+        content: |-
+          # Hello {{ user }}
+          
+          **🌼 F1 Flowering Room**
+          **Stage:** Flowering | **{{ states('sensor.f1_days_in_flower') }}**
+          **Lights:** {% if is_state('switch.f1_lights1', 'on') %}💡 ON{% else %}🌑 OFF{% endif %}
+          
+          **Last Watering:** 🚰 {{ relative_time(states.switch.f1_feed.last_changed) }} ago
+          
+          {% set alerts = [] %}
+          {% if is_state('input_boolean.f1_watering_enabled', 'off') %}
+          {% set alerts = alerts + ['F1 Watering is OFF'] %}
+          {% endif %}
+          {% if alerts | length > 0 %}
+          ⚠️ **Warning:**
+          {% for alert in alerts %}- {{ alert }}{% endfor %}
+          {% else %}
+          ✅ **All Systems Nominal**
+          {% endif %}
+    
+    sections:
+      # ============================================
+      # ENVIRONMENT MONITORING SECTION
+      # ============================================
+      - type: grid
+        cards:
+          # Environment Monitor Card
+          - type: custom:grow-environment-card
+            title: F1 Environment Monitor
+            entities:
+              temperature: sensor.f1_room_stats_f1_room_stats_average_temperature
+              humidity: sensor.f1_room_stats_f1_room_stats_average_humidity
+              vpd: sensor.f1_room_stats_f1_room_stats_room_vpd
+              co2: sensor.f1_room_stats_f1_room_stats_co2
+          
+          # VPD Chart - Using ha-vpd-chart (your existing card)
+          - type: custom:ha-vpd-chart
+            vpd_phases:
+              - upper: 0
+                className: gray-danger-zone
+                color: '#999999'
+              - lower: 0
+                upper: 0.4
+                className: under-transpiration
+                color: '#1a6c9c'
+              - lower: 0.4
+                upper: 0.8
+                className: early-veg
+                color: '#22ab9c'
+              - lower: 0.8
+                upper: 1.2
+                className: late-veg
+                color: '#9cc55b'
+              - lower: 1.2
+                upper: 1.6
+                className: mid-late-flower
+                color: '#e7c12b'
+              - lower: 1.6
+                className: danger-zone
+                color: '#ce4234'
+            rooms:
+              - temperature: sensor.f1_room_stats_f1_room_stats_canopy_temperature
+                humidity: sensor.f1_room_stats_f1_room_stats_average_humidity
+                name: ''
+                leaf_temperature: sensor.f1_room_stats_f1_room_stats_canopy_temperature
+            leaf_temperature_offset: 2
+      
+      # ============================================
+      # CAMERA SECTION
+      # ============================================
+      - type: grid
+        cards:
+          # Camera Card with RTSP
+          - type: custom:grow-camera-card
+            title: F1 Live Camera
+            rtsp_url: "rtsp://192.168.1.228:554/user=goatboy_password=SmokeupDab710_channel=4_stream=1.sdp"
+            rtsp_username: goatboy
+            rtsp_password: SmokeupDab710
+            rtsp_snapshot_url: "http://192.168.1.228/snapshot.jpg"
+            snapshot_times:
+              - "06:00"
+              - "12:00"
+              - "18:00"
+              - "00:00"
+            snapshot_storage: /config/www/snapshots/f1/
+      
+      # ============================================
+      # GROW REPORT SECTION
+      # ============================================
+      - type: grid
+        cards:
+          # Grow Report Card with Athena Pro Schedule
+          - type: custom:grow-report-card
+            title: F1 Grow Report
+            room_name: F1 Flowering Room
+            start_date_entity: input_datetime.f1_start_date
+            temperature_entity: sensor.f1_room_stats_f1_room_stats_average_temperature
+            humidity_entity: sensor.f1_room_stats_f1_room_stats_average_humidity
+            vpd_entity: sensor.f1_room_stats_f1_room_stats_room_vpd
+            co2_entity: sensor.f1_room_stats_f1_room_stats_co2
+            lights_entity: switch.f1_lights1
+            light_hours: 12
+            feed_system: athena_pro
+            grow_medium: coco
+      
+      # ============================================
+      # CONTROLS SECTION
+      # ============================================
+      - type: grid
+        cards:
+          # Switch Control Card with Tabs
+          - type: custom:grow-switch-card
+            title: F1 Equipment Control
+            tabs:
+              - name: Lighting
+                switches:
+                  - entity: switch.f1_lights1
+                    name: Lights 1
+                    icon: "mdi:lightbulb"
+                  - entity: switch.f1_lights2
+                    name: Lights 2
+                    icon: "mdi:lightbulb-on"
+                  - entity: switch.f1_lights3
+                    name: Lights 3
+                    icon: "mdi:lightbulb-on"
+              
+              - name: Climate
+                switches:
+                  - entity: switch.f1_infan
+                    name: Intake Fan
+                    icon: "mdi:fan"
+                  - entity: switch.f1_outfan
+                    name: Exhaust Fan
+                    icon: "mdi:fan-chevron-up"
+                  - entity: switch.f1_humidifier
+                    name: Humidifier
+                    icon: "mdi:air-humidifier"
+                  - entity: switch.f1_heater
+                    name: Heater
+                    icon: "mdi:radiator"
+                  - entity: switch.f1_co2
+                    name: CO2 Solenoid
+                    icon: "mdi:molecule-co2"
+              
+              - name: Irrigation
+                switches:
+                  - entity: switch.f1_feed
+                    name: Feed Pump
+                    icon: "mdi:pump"
+                  - entity: switch.ft_pump
+                    name: FT Pump
+                    icon: "mdi:water-pump"
+              
+              - name: Settings
+                switches:
+                  - entity: input_boolean.f1_co2_on_off
+                    name: CO2 Enable
+                    icon: "mdi:molecule-co2"
+                  - entity: input_boolean.f1_watering_enabled
+                    name: Watering Enable
+                    icon: "mdi:water"
+          
+          # Climate Control
+          - type: thermostat
+            entity: climate.150633094749431_climate
+            name: F1 Heat Pump Control
+            features:
+              - style: icons
+                type: climate-hvac-modes
+                hvac_modes:
+                  - 'off'
+                  - auto
+                  - cool
+                  - dry
+                  - heat
+                  - fan_only
+      
+      # ============================================
+      # DETAILED SENSORS SECTION
+      # ============================================
+      - type: grid
+        title: Temperature & Humidity Sensors
+        cards:
+          - type: entities
+            title: 🌡️ Temperature Sensors
+            entities:
+              - entity: sensor.f1_room_stats_f1_room_stats_temperature_1
+                name: Temp Sensor 1
+              - entity: sensor.f1_room_stats_f1_room_stats_temperature_2
+                name: Temp Sensor 2
+              - entity: sensor.f1_room_stats_f1_room_stats_temperature_3
+                name: Temp Sensor 3
+              - entity: sensor.f1_room_stats_f1_room_stats_average_temperature
+                name: Average Temperature
+                icon: mdi:thermometer-lines
+              - entity: sensor.f1_room_stats_f1_room_stats_leaf_temperature
+                name: Leaf Temperature
+                icon: mdi:thermometer
+              - entity: sensor.f1_room_stats_f1_room_stats_canopy_temperature
+                name: Canopy Temperature
+                icon: mdi:thermometer
+          
+          - type: entities
+            title: 💧 Humidity Sensors
+            entities:
+              - entity: sensor.f1_room_stats_f1_room_stats_humidity_1
+                name: Humidity Sensor 1
+              - entity: sensor.f1_room_stats_f1_room_stats_humidity_2
+                name: Humidity Sensor 2
+              - entity: sensor.f1_room_stats_f1_room_stats_humidity_3
+                name: Humidity Sensor 3
+              - entity: sensor.f1_room_stats_f1_room_stats_average_humidity
+                name: Average Humidity
+                icon: mdi:water-percent-alert
+      
+      # ============================================
+      # SOIL & NUTRIENT MONITORING
+      # ============================================
+      - type: grid
+        title: Soil & Nutrient Monitoring
+        cards:
+          - type: entities
+            title: 🌱 Soil Monitoring
+            entities:
+              - entity: sensor.f1_room_stats_f1_room_stats_soil_temp_1
+                name: Soil Temp 1
+                icon: mdi:thermometer-probe
+              - entity: sensor.f1_room_stats_f1_room_stats_soil_temp_2
+                name: Soil Temp 2
+                icon: mdi:thermometer-probe
+              - entity: sensor.f1_room_stats_f1_room_stats_soil_temp_3
+                name: Soil Temp 3
+                icon: mdi:thermometer-probe
+              - entity: sensor.f1_room_stats_f1_room_stats_vwc_1
+                name: VWC 1
+                icon: mdi:water-percent
+              - entity: sensor.f1_room_stats_f1_room_stats_vwc_2
+                name: VWC 2
+                icon: mdi:water-percent
+              - entity: sensor.f1_room_stats_f1_room_stats_vwc_3
+                name: VWC 3
+                icon: mdi:water-percent
+          
+          - type: entities
+            title: 🧪 Nutrient Analysis
+            entities:
+              - entity: sensor.f1_room_stats_f1_room_stats_ec_1
+                name: EC Level 1
+                icon: mdi:lightning-bolt
+              - entity: sensor.f1_room_stats_f1_room_stats_ec_2
+                name: EC Level 2
+                icon: mdi:lightning-bolt
+              - entity: sensor.f1_room_stats_f1_room_stats_ec_3
+                name: EC Level 3
+                icon: mdi:lightning-bolt
+              - entity: sensor.f1_room_stats_f1_room_stats_ms_cm_1
+                name: mS/cm 1
+                icon: mdi:flash
+              - entity: sensor.f1_room_stats_f1_room_stats_ms_cm_2
+                name: mS/cm 2
+                icon: mdi:flash
+              - entity: sensor.f1_room_stats_f1_room_stats_ms_cm_3
+                name: mS/cm 3
+                icon: mdi:flash
+      
+      # ============================================
+      # VWC & EC CHART
+      # ============================================
+      - type: grid
+        cards:
+          - type: custom:apexcharts-card
+            graph_span: 24h
+            header:
+              show: true
+              title: F1 VWC & EC Monitoring
+              show_states: true
+              colorize_states: true
+            yaxis:
+              - id: vwc
+              - id: ms_cm
+                opposite: true
+            apex_config:
+              chart:
+                foreColor: '#ccc'
+                theme:
+                  mode: '#000'
+              stroke:
+                width: 2
+              grid:
+                borderColor: '#555'
+              legend:
+                show: true
+              yaxis:
+                - title:
+                    text: VWC
+                  show: true
+                - opposite: true
+                  title:
+                    text: µS/cm
+                  show: true
+            series:
+              - entity: sensor.f1_room_stats_f1_room_stats_vwc_1
+                name: VWC 1
+                yaxis_id: vwc
+                color: '#3498db'
+              - entity: sensor.f1_room_stats_f1_room_stats_vwc_2
+                name: VWC 2
+                yaxis_id: vwc
+                color: '#5dade2'
+              - entity: sensor.f1_room_stats_f1_room_stats_vwc_3
+                name: VWC 3
+                yaxis_id: vwc
+                color: '#85c1e9'
+              - entity: sensor.f1_room_stats_f1_room_stats_ms_cm_1
+                name: µS/cm 1
+                yaxis_id: ms_cm
+                color: '#f1c40f'
+              - entity: sensor.f1_room_stats_f1_room_stats_ms_cm_2
+                name: µS/cm 2
+                yaxis_id: ms_cm
+                color: '#f4d03f'
+              - entity: sensor.f1_room_stats_f1_room_stats_ms_cm_3
+                name: µS/cm 3
+                yaxis_id: ms_cm
+                color: '#f7dc6f'
+      
+      # ============================================
+      # SETTINGS & STATUS
+      # ============================================
+      - type: grid
+        title: Settings & Status
+        cards:
+          - type: entities
+            title: ⚙️ Settings
+            entities:
+              - entity: input_datetime.f1_start_date
+                name: Start Date
+              - entity: binary_sensor.f1_light_schedule
+                name: Light Schedule
+              - entity: input_button.f1_co2_kill
+                name: CO2 Kill Switch
