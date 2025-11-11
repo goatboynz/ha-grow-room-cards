@@ -328,3 +328,61 @@ views:
               - F1 Flowering Room
             enable_sound: true
             show_history: true
+
+      # ============================================
+      # GROW JOURNAL
+      # ============================================
+      - type: grid
+        cards:
+          - type: custom:grow-journal-card
+            title: F1 Grow Journal
+            room_name: F1
+            storage_entity: input_text.f1_journal_storage
+            tags:
+              - Watering
+              - Feeding
+              - Training
+              - Defoliation
+              - Observation
+              - Issue
+            show_images: true
+            max_entries: 50
+      
+      # ============================================
+      # GROW CALENDAR
+      # ============================================
+      - type: grid
+        cards:
+          - type: custom:grow-calendar-card
+            title: Grow Calendar
+            rooms:
+              - name: F1
+                start_date_entity: input_datetime.f1_start_date
+                color: '#2ecc71'
+                stage: Vegetative
+              - name: F2
+                start_date_entity: input_datetime.f2_start_date
+                color: '#9b59b6'
+                stage: Flowering
+            show_week_numbers: true
+            show_milestones: true
+      
+      # ============================================
+      # SPECTRUM ANALYSIS
+      # ============================================
+      - type: grid
+        cards:
+          - type: custom:grow-spectrum-card
+            title: F1 Light Spectrum
+            sensor_prefix: sensor.f1_room_stats_f1_room_stats
+            channels:
+              - spectrum_415nm_violet
+              - spectrum_445nm_indigo
+              - spectrum_480nm_blue
+              - spectrum_515nm_cyan
+              - spectrum_555nm_green
+              - spectrum_590nm_yellow
+              - spectrum_630nm_orange
+              - spectrum_680nm_red
+            show_par: true
+            show_ratios: true
