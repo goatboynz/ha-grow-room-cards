@@ -1,0 +1,289 @@
+# F2 Flowering Room Dashboard
+# Using Grow Room Cards v1.0
+
+views:
+  - type: sections
+    title: F2 Flowering Room
+    path: f2
+    icon: mdi:flower-tulip-outline
+    
+    # Header Card
+    header:
+      card:
+        type: markdown
+        content: |-
+          {% set time = now().hour %}
+          {% if time >= 5 and time < 12 %}{% set greeting = 'Good morning' %}
+          {% elif time >= 12 and time < 17 %}{% set greeting = 'Good afternoon' %}
+          {% elif time >= 17 and time < 24 %}{% set greeting = 'Good evening' %}
+          {% elif time >= 0 and time < 5 %}{% set greeting = 'You should be sleeping' %}
+          {% endif %}
+          
+          # {{greeting}}, {{user}}!
+          It's {{now().hour}}:{{now().minute}}
+          
+          **🌼 Flowering Room F2**
+          **Stage:** Flowering | **{{ states('sensor.f2_days_in_flower') }}**
+          **Lights:** {% if is_state('switch.f2_light', 'on') %}💡 ON{% else %}🌑 OFF{% endif %}
+    
+    sections:
+      # ============================================
+      # MAIN OVERVIEW SECTION
+      # ============================================
+      - type: grid
+        cards:
+          # Room Overview Card - Main Dashboard
+          - type: custom:grow-room-overview-card
+            title: F2 Room Overview
+            room_name: F2 Flowering Room
+            start_date_entity: input_datetime.f2_start_date
+            lights_entity: switch.f2_light
+            temperature_entity: sensor.f2_room_stats_f2_room_temperature
+            humidity_entity: sensor.f2_room_stats_f2_room_humidity
+            vpd_entity: sensor.f2_room_stats_f2_room_air_vpd
+            leaf_vpd_entity: sensor.f2_leaf_vpd_offset
+            co2_entity: sensor.f2_room_stats_f2_room_co2
+            last_watering_entity: switch.irrigation_controller_ft_zone_1
+            alert_entities:
+              - binary_sensor.f2_room_stats_f2_light_leak_detected
+              - binary_sensor.f2_room_stats_f2_light_failure
+            show_sparklines: true
+            light_hours: 12
+      
+      # ============================================
+      # ENVIRONMENT MONITORING SECTION
+      # ============================================
+      - type: grid
+        cards:
+          # Environment Monitor Card
+          - type: custom:grow-environment-card
+            title: Environment Monitor
+            entities:
+              temperature: sensor.f2_room_stats_f2_room_temperature
+              humidity: sensor.f2_room_stats_f2_room_humidity
+              vpd: sensor.f2_room_stats_f2_room_air_vpd
+              co2: sensor.f2_room_stats_f2_room_co2
+          
+          # VPD Chart Card
+          - type: custom:grow-vpd-chart-card
+            title: VPD Analysis
+            temperature_entity: sensor.f2_room_stats_f2_room_temperature
+            humidity_entity: sensor.f2_room_stats_f2_room_humidity
+            vpd_entity: sensor.f2_room_stats_f2_room_air_vpd
+            leaf_offset: 2
+      
+      # ============================================
+      # CAMERA SECTION
+      # ============================================
+      - type: grid
+        cards:
+          # Camera Card with RTSP
+          - type: custom:grow-camera-card
+            title: F2 Live Camera
+            rtsp_url: "rtsp://192.168.1.228:554/user=goatboy_password=SmokeupDab710_channel=6_stream=1.sdp"
+            rtsp_username: goatboy
+            rtsp_password: SmokeupDab710
+            rtsp_snapshot_url: "http://192.168.1.228/snapshot.jpg"
+            snapshot_times:
+              - "06:00"
+              - "12:00"
+              - "18:00"
+              - "00:00"
+            snapshot_storage: /config/www/snapshots/f2/
+      
+      # ============================================
+      # GROW REPORT SECTION
+      # ============================================
+      - type: grid
+        cards:
+          # Grow Report Card with Athena Pro Schedule
+          - type: custom:grow-report-card
+            title: F2 Grow Report
+            room_name: F2 Flowering Room
+            start_date_entity: input_datetime.f2_start_date
+            temperature_entity: sensor.f2_room_stats_f2_room_temperature
+            humidity_entity: sensor.f2_room_stats_f2_room_humidity
+            vpd_entity: sensor.f2_room_stats_f2_room_air_vpd
+            co2_entity: sensor.f2_room_stats_f2_room_co2
+            lights_entity: switch.f2_light
+            zone_1_entity: switch.irrigation_controller_ft_zone_1
+            zone_2_entity: switch.irrigation_controller_f1_zone_1
+            light_hours: 12
+            feed_system: athena_pro
+            grow_medium: coco
+      
+      # ============================================
+      # CONTROLS SECTION
+      # ============================================
+      - type: grid
+        cards:
+          # Switch Control Card with Tabs
+          - type: custom:grow-switch-card
+            title: F2 Equipment Control
+            tabs:
+              - name: Lighting
+                switches:
+                  - entity: switch.f2_light
+                    name: Main Lights
+                    icon: "mdi:lightbulb"
+                  - entity: switch.f2_lights1
+                    name: Lights 1
+                    icon: "mdi:lightbulb-on"
+                  - entity: switch.f2_lights2
+                    name: Lights 2
+                    icon: "mdi:lightbulb-on"
+              
+              - name: Climate
+                switches:
+                  - entity: switch.f2_infan
+                    name: Intake Fan
+                    icon: "mdi:fan"
+                  - entity: switch.f2_outfan
+                    name: Exhaust Fan
+                    icon: "mdi:fan-chevron-up"
+                  - entity: switch.f2_humidifier
+                    name: Humidifier
+                    icon: "mdi:air-humidifier"
+                  - entity: switch.f2_co2
+                    name: CO2 Solenoid
+                    icon: "mdi:molecule-co2"
+              
+              - name: Irrigation
+                switches:
+                  - entity: switch.f2_pump
+                    name: F2 Pump
+                    icon: "mdi:pump"
+                  - entity: switch.irrigation_controller_ft_zone_1
+                    name: Zone 1
+                    icon: "mdi:sprinkler-variant"
+                  - entity: switch.irrigation_controller_f1_zone_1
+                    name: Zone 2
+                    icon: "mdi:sprinkler-variant"
+              
+              - name: Settings
+                switches:
+                  - entity: input_boolean.f2_co2_on_off
+                    name: CO2 Enable
+                    icon: "mdi:molecule-co2"
+                  - entity: input_boolean.f2_watering_enabled
+                    name: Watering Enable
+                    icon: "mdi:water"
+          
+          # Climate Control
+          - type: thermostat
+            entity: climate.151732606578302_climate
+            name: F2 Heat Pump Control
+            features:
+              - style: icons
+                type: climate-hvac-modes
+                hvac_modes:
+                  - 'off'
+                  - auto
+                  - cool
+                  - dry
+                  - heat
+                  - fan_only
+      
+      # ============================================
+      # IRRIGATION SECTION
+      # ============================================
+      - type: grid
+        cards:
+          # Irrigation Control Card
+          - type: custom:grow-irrigation-card
+            title: F2 Irrigation
+            zones:
+              - name: Zone 1 (FT)
+                switch: switch.irrigation_controller_ft_zone_1
+              - name: Zone 2 (F1)
+                switch: switch.irrigation_controller_f1_zone_1
+            schedule_entity: input_boolean.f2_watering_enabled
+      
+      # ============================================
+      # SPECTRUM ANALYSIS SECTION (Mid Sensor)
+      # ============================================
+      - type: grid
+        cards:
+          # Spectrum Sensor Card
+          - type: custom:grow-spectrum-card
+            title: F2 Light Spectrum (Mid)
+            sensor_prefix: sensor.f2_stats_mid_f2_stats_mid
+            channels:
+              - spectrum_415nm_violet
+              - spectrum_445nm_indigo
+              - spectrum_480nm_blue
+              - spectrum_515nm_cyan
+              - spectrum_555nm_green
+              - spectrum_590nm_yellow
+              - spectrum_630nm_orange
+              - spectrum_680nm_red
+            show_par: true
+            show_ratios: true
+      
+      # ============================================
+      # ADDITIONAL SENSORS SECTION
+      # ============================================
+      - type: grid
+        title: Additional Sensors
+        cards:
+          - type: entities
+            title: F2 Room Sensors
+            entities:
+              - entity: sensor.f2_room_stats_f2_room_temperature
+                name: Temperature
+                icon: mdi:thermometer
+              - entity: sensor.f2_room_stats_f2_room_leaf_temperature
+                name: Leaf Temperature
+                icon: mdi:thermometer
+              - entity: sensor.f2_room_stats_f2_room_humidity
+                name: Humidity
+                icon: mdi:water-percent
+              - entity: sensor.f2_room_stats_f2_room_air_vpd
+                name: Room VPD
+                icon: mdi:home-thermometer
+              - entity: sensor.f2_room_stats_f2_room_leaf_vpd
+                name: Leaf VPD
+                icon: mdi:leaf
+              - entity: sensor.f2_leaf_vpd_offset
+                name: Leaf VPD (Offset)
+                icon: mdi:leaf
+              - entity: sensor.f2_room_stats_f2_room_co2
+                name: CO2 Level
+                icon: mdi:molecule-co2
+              - entity: sensor.f2_room_stats_f2_room_dew_point
+                name: Dew Point
+                icon: mdi:water-thermometer
+          
+          - type: entities
+            title: F2 Mid Sensors
+            entities:
+              - entity: sensor.f2_stats_mid_f2_stats_mid_room_temperature
+                name: Temperature
+              - entity: sensor.f2_stats_mid_f2_stats_mid_leaf_temperature
+                name: Leaf Temperature
+              - entity: sensor.f2_stats_mid_f2_stats_mid_room_humidity
+                name: Humidity
+              - entity: sensor.f2_stats_mid_f2_stats_mid_room_air_vpd
+                name: Room VPD
+              - entity: sensor.f2_stats_mid_f2_stats_mid_room_leaf_vpd
+                name: Leaf VPD
+              - entity: sensor.f2_stats_mid_f2_stats_mid_co2
+                name: CO2
+              - entity: sensor.f2_stats_mid_f2_stats_mid_ambient_light_lux
+                name: Ambient Light
+          
+          - type: entities
+            title: Alerts & Status
+            entities:
+              - entity: binary_sensor.f2_room_stats_f2_light_failure
+                name: Light Failure
+              - entity: binary_sensor.f2_room_stats_f2_light_leak_detected
+                name: Light Leak
+              - entity: binary_sensor.f2_stats_mid_f2_stats_mid_light_failure
+                name: Mid Light Failure
+              - entity: binary_sensor.f2_stats_mid_f2_stats_mid_light_leak_detected
+                name: Mid Light Leak
+              - entity: input_datetime.f2_start_date
+                name: Start Date
+              - entity: binary_sensor.f2_light_schedule
+                name: Light Schedule
